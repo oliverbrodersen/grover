@@ -5,8 +5,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,10 +20,12 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
 
     private ArrayList<Plant> mPlants;
     final private OnListItemClickListener mOnListItemClickListener;
+    final private OnListItemLongClickListener mOnListItemLongClickListener;
 
-    public PlantAdapterRV(ArrayList<Plant> plants, OnListItemClickListener listener){
+    public PlantAdapterRV(ArrayList<Plant> plants, OnListItemClickListener listener, OnListItemLongClickListener listener2){
         mPlants = plants;
         mOnListItemClickListener = listener;
+        mOnListItemLongClickListener = listener2;
     }
 
     @NonNull
@@ -39,23 +41,30 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         viewHolder.icon.setImageResource(mPlants.get(position).getmIconId());
         viewHolder.waterTExt.setText(mPlants.get(position).waterWhen());
 
-        double width = (mPlants.get(position).getDaysBetweenWater() - mPlants.get(position).getDaysSinceLastWater())/mPlants.get(position).getDaysBetweenWater() * 120;
-
-        viewHolder.hydroMeter.setLayoutParams(new CardView.LayoutParams((int) pixelsToDp(viewHolder, (int) width), ViewGroup.LayoutParams.MATCH_PARENT));
-
+        //If plant needs watering
         if(mPlants.get(position).waterToday()<=0){
+            if(mPlants.get(position).waterToday()==0)
+                viewHolder.hydroMeterBg.setImageResource(R.drawable.orange_gradient);
+            else
+                viewHolder.hydroMeterBg.setImageResource(R.drawable.red_gradient);
+
+            //Move text up
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) viewHolder.waterTExt.getLayoutParams();
-            lp.setMargins(0, (int) pixelsToDp(viewHolder, 2), 0, 0);
+            lp.setMargins(0, 0, 0, 0);
             viewHolder.waterTExt.setLayoutParams(lp);
-            if(mPlants.get(position).waterToday()==0){
-                viewHolder.hydroMeterBg.setCardBackgroundColor(viewHolder.context.getColor(R.color.orange));
-                viewHolder.waterTExt.setTextColor(viewHolder.context.getColor(R.color.black));
-            }
-            else{
-                viewHolder.hydroMeterBg.setCardBackgroundColor(viewHolder.context.getColor(R.color.red));
-                viewHolder.waterTExt.setTextColor(viewHolder.context.getColor(R.color.white));
-            }
+
+            //Change text color and size
+            viewHolder.waterTExt.setTextColor(viewHolder.context.getColor(R.color.white));
+            viewHolder.waterTExt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+            //Remove hydrometer
+            viewHolder.hydroMeter.setLayoutParams(new FrameLayout.LayoutParams(0, (int) pixelsToDp(viewHolder, 15)));
+
             viewHolder.waterTExt.setElevation(pixelsToDp(viewHolder, 2));
+        }
+        else{
+            double width = (mPlants.get(position).getDaysBetweenWater() - mPlants.get(position).getDaysSinceLastWater())/mPlants.get(position).getDaysBetweenWater() * 120;
+            viewHolder.hydroMeter.setLayoutParams(new FrameLayout.LayoutParams((int) pixelsToDp(viewHolder, (int) width), (int) pixelsToDp(viewHolder, 15)));
         }
 
         if (mPlants.get(position).isFavorite())
@@ -66,7 +75,7 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         return mPlants.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView name;
         TextView nameLatin;
@@ -74,7 +83,7 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         ImageView icon;
         ImageView fav;
         CardView hydroMeter;
-        CardView hydroMeterBg;
+        ImageView hydroMeterBg;
         Context context;
 
         ViewHolder(View itemView) {
@@ -88,16 +97,25 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             hydroMeterBg = itemView.findViewById(R.id.hydroMeterBg);
             context = itemView.getContext();
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             mOnListItemClickListener.onListItemClick(getAdapterPosition());
         }
+        @Override
+        public boolean onLongClick(View v) {
+            mOnListItemLongClickListener.onListItemLongClick(getAdapterPosition());
+            return true;
+        }
     }
 
     public interface OnListItemClickListener {
         void onListItemClick(int clickedItemIndex);
+    }
+    public interface OnListItemLongClickListener {
+        void onListItemLongClick(int clickedItemIndex);
     }
     private float pixelsToDp(ViewHolder viewHolder, int pixels){
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) pixels, viewHolder.context.getResources().getDisplayMetrics());

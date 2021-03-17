@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="220dp">
+    android:layout_height="215dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="150dp"
-        android:layout_height="200dp"
+        android:layout_height="195dp"
         app:cardCornerRadius="15dp"
         android:background="@color/bg"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,24 +65,46 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/plantName" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/hydroMeterBg"
+            <FrameLayout
+                android:id="@+id/frameLayout"
                 android:layout_width="120dp"
                 android:layout_height="15dp"
-                android:layout_marginStart="15dp"
                 android:layout_marginBottom="15dp"
-                app:cardCornerRadius="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/hydroMeterContainer"
+                    android:layout_width="120dp"
+                    android:layout_height="15dp"
+                    android:layout_marginBottom="15dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:id="@+id/hydroMeterBg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/white_gradient" />
+                </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/hydroMeter"
                     android:layout_width="20dp"
                     android:layout_height="15dp"
-                    app:cardBackgroundColor="@color/green_main"
-                    app:cardCornerRadius="10dp" />
-            </androidx.cardview.widget.CardView>
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/green_gradient" />
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+
 
             <TextView
                 android:id="@+id/waterText"
@@ -97,7 +119,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.504"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/hydroMeterBg" />
+                app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

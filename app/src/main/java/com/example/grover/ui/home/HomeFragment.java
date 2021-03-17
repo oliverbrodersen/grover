@@ -32,7 +32,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemClickListener {
+public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemClickListener, PlantAdapterRV.OnListItemLongClickListener {
 
     private HomeViewModel homeViewModel;
     RecyclerView mPlantList;
@@ -55,7 +55,7 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
         plants.add(new Plant("Cocospalme", "Cocos nucifera", R.drawable.p3, true, 8, "07-03-2021"));
         plants.add(new Plant("Banantræ", "Bananus fantomium", R.drawable.p4, false, 15,"14-03-2021"));
 
-        mPlantAdapter = new PlantAdapterRV(plants, this);
+        mPlantAdapter = new PlantAdapterRV(plants, this, this);
         mPlantList.setAdapter(mPlantAdapter);
 
         return root;
@@ -65,5 +65,10 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
     public void onListItemClick(int clickedItemIndex) {
         int pokemonNumber = clickedItemIndex + 1;
         Toast.makeText(getContext(), "Number: " + pokemonNumber, Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void onListItemLongClick(int clickedItemIndex) {
+        int pokemonNumber = clickedItemIndex + 1;
+        Toast.makeText(getContext(), "LONG CLICKED - Number: " + pokemonNumber, Toast.LENGTH_SHORT).show();
     }
 }
