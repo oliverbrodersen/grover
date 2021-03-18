@@ -17,6 +17,7 @@ public class Plant {
     private boolean favorite;
     private double daysBetweenWater;
     private String lastWaterDate;
+    private String lastWaterDateUndo;
     private SimpleDateFormat sdf;
 
     public Plant(String name, String latinName, int mIconId, boolean favorite, double daysBetweenWater, String lastWaterMS) {
@@ -66,9 +67,13 @@ public class Plant {
             return 1;
     }
     public void water(){
+        lastWaterDateUndo = lastWaterDate;
         lastWaterDate = sdf.format(new Date());
     }
 
+    public void undoWater(){
+        lastWaterDate = lastWaterDateUndo;
+    }
 
     public double getDaysBetweenWater() {
         return daysBetweenWater;

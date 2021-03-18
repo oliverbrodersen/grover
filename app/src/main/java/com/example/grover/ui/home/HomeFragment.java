@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.grover.Plant;
 import com.example.grover.PlantAdapterRV;
 import com.example.grover.R;
+import com.example.grover.ui.Home;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -37,7 +38,8 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
     private HomeViewModel homeViewModel;
     RecyclerView mPlantList;
     PlantAdapterRV mPlantAdapter;
-
+    Home home;
+    TextView plantStatus;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,24 +53,50 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
 
         ArrayList<Plant> plants = new ArrayList<>();
         plants.add(new Plant("Philodendron","Philodendron Red Beauty", R.drawable.p1, true, 14, "14-03-2021"));
-        plants.add(new Plant("Fredslilje", "Spathiphyllum", R.drawable.p2, false, 5, "12-03-2021"));
+        plants.add(new Plant("Fredslilje", "Spathiphyllum", R.drawable.p2, false, 5, "13-03-2021"));
         plants.add(new Plant("Cocospalme", "Cocos nucifera", R.drawable.p3, true, 8, "07-03-2021"));
         plants.add(new Plant("Banantræ", "Bananus fantomium", R.drawable.p4, false, 15,"14-03-2021"));
 
+        plants.add(new Plant("Trailing Jade", "Peperomia rotundifolia", R.drawable.p5, false, 10,"14-03-2021"));
+        plants.add(new Plant("Nerve plante", "Fittonia", R.drawable.p6, false, 7,"14-03-2021"));
+        plants.add(new Plant("Guldranke", "Epipremnum Aureum", R.drawable.p7, true, 10,"04-03-2021"));
+
+        home = new Home(420, plants);
         mPlantAdapter = new PlantAdapterRV(plants, this, this);
         mPlantList.setAdapter(mPlantAdapter);
+
+        plantStatus = root.findViewById(R.id.plantStatus);
+        plantStatus.setText(home.getPlantStatus());
 
         return root;
     }
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        int pokemonNumber = clickedItemIndex + 1;
-        Toast.makeText(getContext(), "Number: " + pokemonNumber, Toast.LENGTH_SHORT).show();
+        Snackbar mSnackbar = Snackbar.make(getView(), home.getPlants().get(clickedItemIndex).getName(), Snackbar.LENGTH_SHORT);
+        mSnackbar.show();
     }
     @Override
     public void onListItemLongClick(int clickedItemIndex) {
-        int pokemonNumber = clickedItemIndex + 1;
-        Toast.makeText(getContext(), "LONG CLICKED - Number: " + pokemonNumber, Toast.LENGTH_SHORT).show();
+        home.getPlants().get(clickedItemIndex).water();
+        plantStatus.setText(home.getPlantStatus());
+        //update view;
+        mPlantAdapter.notifyDataSetChanged();
+
+        Snackbar snackbar = Snackbar
+                .make(getView(), "Watered " + home.getPlants().get(clickedItemIndex).getName(), Snackbar.LENGTH_LONG)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        home.getPlants().get(clickedItemIndex).undoWater();
+                        plantStatus.setText(home.getPlantStatus());
+                        mPlantAdapter.notifyDataSetChanged();
+
+                        Snackbar mSnackbar = Snackbar.make(getView(), "Watering has been undone", Snackbar.LENGTH_SHORT);
+                        mSnackbar.show();
+                    }
+                });
+
+        snackbar.show();
     }
 }

@@ -2,16 +2,20 @@ package com.example.grover;
 
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -50,12 +54,12 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
 
             //Move text up
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) viewHolder.waterTExt.getLayoutParams();
-            lp.setMargins(0, 0, 0, 0);
+            lp.setMargins(0, (int)pixelsToDp(viewHolder, 0), 0, 0);
             viewHolder.waterTExt.setLayoutParams(lp);
 
             //Change text color and size
             viewHolder.waterTExt.setTextColor(viewHolder.context.getColor(R.color.white));
-            viewHolder.waterTExt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            viewHolder.waterTExt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
 
             //Remove hydrometer
             viewHolder.hydroMeter.setLayoutParams(new FrameLayout.LayoutParams(0, (int) pixelsToDp(viewHolder, 15)));
@@ -63,20 +67,37 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             viewHolder.waterTExt.setElevation(pixelsToDp(viewHolder, 2));
         }
         else{
+            viewHolder.hydroMeterBg.setImageResource(R.drawable.white_gradient);
+            //Move text up
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) viewHolder.waterTExt.getLayoutParams();
+            lp.setMargins(0, (int) pixelsToDp(viewHolder, 16), 0, 0);
+            viewHolder.waterTExt.setLayoutParams(lp);
+            //Change text color and size
+            viewHolder.waterTExt.setTextColor(viewHolder.context.getColor(R.color.text_light));
+            viewHolder.waterTExt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
+
             double width = (mPlants.get(position).getDaysBetweenWater() - mPlants.get(position).getDaysSinceLastWater())/mPlants.get(position).getDaysBetweenWater() * 120;
             viewHolder.hydroMeter.setLayoutParams(new FrameLayout.LayoutParams((int) pixelsToDp(viewHolder, (int) width), (int) pixelsToDp(viewHolder, 15)));
         }
 
         if (mPlants.get(position).isFavorite())
             viewHolder.fav.setImageResource(R.drawable.fav);
-    }
 
+
+        //Align card
+        if (position % 2 == 0)
+            viewHolder.cardHolder.setGravity(Gravity.RIGHT);
+        else
+            viewHolder.cardHolder.setGravity(Gravity.LEFT);
+
+    }
     public int getItemCount() {
         return mPlants.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
+        LinearLayout cardHolder;
         TextView name;
         TextView nameLatin;
         TextView waterTExt;
@@ -88,6 +109,7 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
 
         ViewHolder(View itemView) {
             super(itemView);
+            cardHolder = itemView.findViewById(R.id.cardHolder);
             name = itemView.findViewById(R.id.plantName);
             nameLatin = itemView.findViewById(R.id.textView4);
             waterTExt = itemView.findViewById(R.id.waterText);
