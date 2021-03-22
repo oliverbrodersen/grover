@@ -39,11 +39,26 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         return new ViewHolder(view);
     }
 
+    public void setNewDataSet(ArrayList<Plant> nPlants){
+        mPlants = nPlants;
+    }
+
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         viewHolder.name.setText(mPlants.get(position).getName());
         viewHolder.nameLatin.setText(mPlants.get(position).getLatinName());
         viewHolder.icon.setImageResource(mPlants.get(position).getmIconId());
         viewHolder.waterTExt.setText(mPlants.get(position).waterWhen());
+
+        //Add margin top to the first row of cards
+        if(position < 2){
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) viewHolder.card.getLayoutParams();
+            lp.setMargins(15, (int) pixelsToDp(viewHolder, 280),15,15);
+        }
+        else{
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) viewHolder.card.getLayoutParams();
+            lp.setMargins(15,15,15,15);
+        }
+
 
         //If plant needs watering
         if(mPlants.get(position).waterToday()<=0){
@@ -82,6 +97,9 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
 
         if (mPlants.get(position).isFavorite())
             viewHolder.fav.setImageResource(R.drawable.fav);
+        else
+            viewHolder.fav.setImageResource(R.drawable.not_fav);
+
 
 
         //Align card
@@ -89,6 +107,10 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             viewHolder.cardHolder.setGravity(Gravity.RIGHT);
         else
             viewHolder.cardHolder.setGravity(Gravity.LEFT);
+
+        viewHolder.drop1.setVisibility(View.VISIBLE);
+        viewHolder.drop2.setVisibility(mPlants.get(position).getWaterLevel()>1?View.VISIBLE:View.INVISIBLE);
+        viewHolder.drop3.setVisibility(mPlants.get(position).getWaterLevel()>2?View.VISIBLE:View.INVISIBLE);
 
     }
     public int getItemCount() {
@@ -103,12 +125,17 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         TextView waterTExt;
         ImageView icon;
         ImageView fav;
+        ImageView drop1;
+        ImageView drop2;
+        ImageView drop3;
+        CardView card;
         CardView hydroMeter;
         ImageView hydroMeterBg;
         Context context;
 
         ViewHolder(View itemView) {
             super(itemView);
+            card = itemView.findViewById(R.id.card);
             cardHolder = itemView.findViewById(R.id.cardHolder);
             name = itemView.findViewById(R.id.plantName);
             nameLatin = itemView.findViewById(R.id.textView4);
@@ -117,6 +144,9 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             fav = itemView.findViewById(R.id.fav);
             hydroMeter = itemView.findViewById(R.id.hydroMeter);
             hydroMeterBg = itemView.findViewById(R.id.hydroMeterBg);
+            drop1 = itemView.findViewById(R.id.drop1);
+            drop2 = itemView.findViewById(R.id.drop2);
+            drop3 = itemView.findViewById(R.id.drop3);
             context = itemView.getContext();
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class Plant {
     private String name;
     private String latinName;
+    private int waterLevel;
     private int mIconId;
     private boolean favorite;
     private double daysBetweenWater;
@@ -20,14 +21,28 @@ public class Plant {
     private String lastWaterDateUndo;
     private SimpleDateFormat sdf;
 
-    public Plant(String name, String latinName, int mIconId, boolean favorite, double daysBetweenWater, String lastWaterMS) {
+    public Plant(String name, String latinName, int mIconId, boolean favorite, double daysBetweenWater, String lastWaterMS, int waterLevel) {
         this.name = name;
         this.latinName = latinName;
         this.mIconId = mIconId;
         this.favorite = favorite;
         this.daysBetweenWater = daysBetweenWater;
         this.lastWaterDate = lastWaterMS;
+        lastWaterDateUndo = lastWaterMS;
+        this.waterLevel = waterLevel;
         sdf= new SimpleDateFormat("dd-M-yyyy");
+    }
+
+    public String getLastWaterDate() {
+        return lastWaterDate;
+    }
+
+    public String getLastWaterDateUndo() {
+        return lastWaterDateUndo;
+    }
+
+    public int getWaterLevel() {
+        return waterLevel;
     }
 
     public Date getLastWaterAsDate(){
@@ -56,15 +71,9 @@ public class Plant {
         long diff = d.getTime() - getLastWaterAsDate().getTime();
         return (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
-    //return 1 if not yet, 0 if today and -1 if overdue
+    //return positive integer if not yet, 0 if today and negative integer if overdue
     public int waterToday(){
-        int waterIn = (int) daysBetweenWater - getDaysSinceLastWater();
-        if(waterIn == 0)
-            return 0;
-        else if(waterIn < 0)
-            return -1;
-        else
-            return 1;
+        return (int) daysBetweenWater - getDaysSinceLastWater();
     }
     public void water(){
         lastWaterDateUndo = lastWaterDate;

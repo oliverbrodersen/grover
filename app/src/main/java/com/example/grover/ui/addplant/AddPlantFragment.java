@@ -1,4 +1,4 @@
-package com.example.grover.ui.gallery;
+package com.example.grover.ui.addplant;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,15 +14,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.grover.R;
 
-public class GalleryFragment extends Fragment {
+public class AddPlantFragment extends Fragment {
 
-    private GalleryViewModel galleryViewModel;
+    private AddPlantViewModel galleryViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         galleryViewModel =
-                new ViewModelProvider(this).get(GalleryViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_gallery, container, false);
+                new ViewModelProvider(this).get(AddPlantViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_add_plant, container, false);
         final TextView textView = root.findViewById(R.id.text_gallery);
         galleryViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

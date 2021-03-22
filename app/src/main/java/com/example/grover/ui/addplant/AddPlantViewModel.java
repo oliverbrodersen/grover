@@ -1,16 +1,16 @@
-package com.example.grover.ui.gallery;
+package com.example.grover.ui.addplant;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel {
+public class AddPlantViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public GalleryViewModel() {
+    public AddPlantViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is gallery fragment");
+        mText.setValue("Add plants here!");
     }
 
     public LiveData<String> getText() {
