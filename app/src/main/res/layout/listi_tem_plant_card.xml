@@ -11,9 +11,10 @@
 
         android:id="@+id/card"
         android:layout_width="150dp"
-        android:layout_height="195dp"
+        android:layout_height="205dp"
         android:layout_margin="10dp"
-        android:background="@color/bg"
+        android:background="@color/white"
+        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -47,25 +48,36 @@
 
             <TextView
                 android:id="@+id/plantName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="15dp"
                 android:fontFamily="@font/varela_round"
                 android:text="TextView"
                 android:textColor="@color/text_main"
+                android:textSize="19sp"
+                android:scrollHorizontally="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
             <TextView
                 android:id="@+id/textView4"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:ellipsize="end"
                 android:fontFamily="@font/varela_round"
+                android:maxLines="1"
+                android:scrollHorizontally="true"
                 android:text="TextView"
                 android:textColor="@color/green_main"
                 android:textSize="8sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/plantName" />
 
@@ -126,35 +138,52 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
-            <LinearLayout
-                android:layout_width="50dp"
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:scaleType="fitXY"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:srcCompat="@drawable/black_gradient" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/varela_round"
+                android:text="2x"
+                android:textAlignment="textEnd"
+                android:textColor="@color/bg"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+                app:layout_constraintEnd_toStartOf="@+id/drop1"
+                app:layout_constraintTop_toTopOf="@+id/imageView7" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/varela_round"
+                android:text="Living room"
+                android:textAlignment="textStart"
+                android:textColor="@color/bg"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+                app:layout_constraintStart_toStartOf="@+id/imageView7"
+                app:layout_constraintTop_toTopOf="@+id/imageView7" />
+
+            <ImageView
+                android:id="@+id/drop1"
+                android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:gravity="end"
-                android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-                app:layout_constraintEnd_toEndOf="@+id/imageView2">
-
-                <ImageView
-                    android:id="@+id/drop3"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    app:srcCompat="@drawable/drop"></ImageView>
-
-                <ImageView
-                    android:id="@+id/drop2"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    app:srcCompat="@drawable/drop"></ImageView>
-
-                <ImageView
-                    android:id="@+id/drop1"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    app:srcCompat="@drawable/drop"></ImageView>
-
-            </LinearLayout>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/imageView7"
+                app:srcCompat="@drawable/ic_blood_donation" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

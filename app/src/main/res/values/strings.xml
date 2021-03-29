@@ -10,4 +10,5 @@
     <string name="menu_home">All plants</string>
     <string name="menu_gallery">My plants</string>
     <string name="menu_slideshow">Friends\' plants</string>
+    <string name="water_every">Water every</string>
 </resources>

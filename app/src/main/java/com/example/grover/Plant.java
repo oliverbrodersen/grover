@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -15,13 +16,15 @@ public class Plant {
     private String latinName;
     private int waterLevel;
     private int mIconId;
+    private int roomId;
     private boolean favorite;
     private double daysBetweenWater;
     private String lastWaterDate;
     private String lastWaterDateUndo;
     private SimpleDateFormat sdf;
+    private ArrayList<PlantLogItem> log;
 
-    public Plant(String name, String latinName, int mIconId, boolean favorite, double daysBetweenWater, String lastWaterMS, int waterLevel) {
+    public Plant(String name, String latinName, int mIconId, boolean favorite, double daysBetweenWater, String lastWaterMS, int waterLevel, int roomId) {
         this.name = name;
         this.latinName = latinName;
         this.mIconId = mIconId;
@@ -30,6 +33,8 @@ public class Plant {
         this.lastWaterDate = lastWaterMS;
         lastWaterDateUndo = lastWaterMS;
         this.waterLevel = waterLevel;
+        this.roomId = roomId;
+        log = new ArrayList<>();
         sdf= new SimpleDateFormat("dd-M-yyyy");
     }
 
@@ -41,8 +46,22 @@ public class Plant {
         return lastWaterDateUndo;
     }
 
+    public int getRoomId() {
+        return roomId;
+    }
+
     public int getWaterLevel() {
         return waterLevel;
+    }
+
+    public void log(String type){
+        log.add(new PlantLogItem(type));
+    }
+    public void log(PlantLogItem plantLogItem){
+        log.add(plantLogItem);
+    }
+    public ArrayList<PlantLogItem> getLog() {
+        return log;
     }
 
     public Date getLastWaterAsDate(){
@@ -78,10 +97,12 @@ public class Plant {
     public void water(){
         lastWaterDateUndo = lastWaterDate;
         lastWaterDate = sdf.format(new Date());
+        log("Water");
     }
 
     public void undoWater(){
         lastWaterDate = lastWaterDateUndo;
+        log.remove(log.size()-1);
     }
 
     public double getDaysBetweenWater() {

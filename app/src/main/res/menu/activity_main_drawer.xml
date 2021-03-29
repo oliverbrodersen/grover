@@ -10,13 +10,10 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic__03_all"
-            android:title="@string/menu_home" />
-        <item
-            android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic__02_male_avatar"
             android:title="@string/menu_gallery" />
         <item
+            android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic__01_friends"
             android:title="@string/menu_slideshow" />
         <item
@@ -39,5 +36,11 @@
             android:title="Add friends" />
         <item
             android:title="My friends" />
+    </group>
+    <group
+        android:id="@+id/accountGroup"
+        android:checkableBehavior="single">
+        <item android:title="My account" />
+        <item android:title="Log out" />
     </group>
 </menu>

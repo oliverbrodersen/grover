@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="?attr/bgColor"
     android:layout_height="match_parent"
-    android:background="@color/bg"
     tools:context=".ui.home.HomeFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -19,7 +19,7 @@
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="match_parent"
-        android:layout_height="235dp"
+        android:layout_height="215dp"
         android:scaleType="fitXY"
         android:src="@drawable/ic_main_top_bg"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +31,7 @@
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="240dp"
         android:scaleType="centerCrop"
         android:src="@drawable/main_top_plants"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,16 +43,16 @@
         android:id="@+id/plantStatus"
         android:layout_width="270dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/varela_round"
         android:text="TextView"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:fontFamily="@font/varela_round"
+        android:textColor="?attr/text2Color"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.313" />
+        app:layout_constraintVertical_bias="0.398" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

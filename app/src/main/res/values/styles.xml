@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="LightTheme">
+        <item name="textColor">#000000</item>
+        <item name="text2Color">#ffffff</item>
+        <item name="bg2Color">#ffffff</item>
+        <item name="bgColor">#f8f8f8</item>
+    </style>
+
+    <style name="DarkTheme">
+        <item name="textColor">#ffffff</item>
+        <item name="text2Color">#1E1E1E</item>
+        <item name="bg2Color">#393939</item>
+        <item name="bgColor">#272727</item>
+    </style>
+</resources>

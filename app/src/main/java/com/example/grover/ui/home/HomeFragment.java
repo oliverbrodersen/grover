@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,8 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
         Class destination = PlantInfoActivity.class;
 
         Intent intent = new Intent(context, destination);
+
+        intent.putExtra("PlantId", clickedItemIndex);
         startActivity(intent);
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -84,7 +87,7 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
                         mPlantAdapter.setNewDataSet(viewModel.getHome().getValue().getPlantsByWaterNeed());
                         mPlantAdapter.notifyDataSetChanged();
 
-                        Snackbar mSnackbar = Snackbar.make(getView(), " has been undone", Snackbar.LENGTH_SHORT);
+                        Snackbar mSnackbar = Snackbar.make(getView(), p.getName() + " has been dehydrated", Snackbar.LENGTH_SHORT);
                         mSnackbar.show();
                     }
                 });

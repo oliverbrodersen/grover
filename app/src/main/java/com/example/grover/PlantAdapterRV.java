@@ -18,6 +18,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.grover.data.HomeRepository;
+
 import java.util.ArrayList;
 
 public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHolder> {
@@ -52,7 +54,7 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         //Add margin top to the first row of cards
         if(position < 2){
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) viewHolder.card.getLayoutParams();
-            lp.setMargins(15, (int) pixelsToDp(viewHolder, 280),15,15);
+            lp.setMargins(15, (int) pixelsToDp(viewHolder, 250),15,15);
         }
         else{
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) viewHolder.card.getLayoutParams();
@@ -108,9 +110,8 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         else
             viewHolder.cardHolder.setGravity(Gravity.LEFT);
 
-        viewHolder.drop1.setVisibility(View.VISIBLE);
-        viewHolder.drop2.setVisibility(mPlants.get(position).getWaterLevel()>1?View.VISIBLE:View.INVISIBLE);
-        viewHolder.drop3.setVisibility(mPlants.get(position).getWaterLevel()>2?View.VISIBLE:View.INVISIBLE);
+        viewHolder.waterAmount.setText(mPlants.get(position).getWaterLevel() + "x");
+        viewHolder.location.setText(HomeRepository.getInstance().getHome().getValue().getRoomById(mPlants.get(position).getRoomId()));
 
     }
     public int getItemCount() {
@@ -122,12 +123,12 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         LinearLayout cardHolder;
         TextView name;
         TextView nameLatin;
+        TextView waterAmount;
         TextView waterTExt;
+        TextView location;
         ImageView icon;
         ImageView fav;
         ImageView drop1;
-        ImageView drop2;
-        ImageView drop3;
         CardView card;
         CardView hydroMeter;
         ImageView hydroMeterBg;
@@ -139,14 +140,14 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             cardHolder = itemView.findViewById(R.id.cardHolder);
             name = itemView.findViewById(R.id.plantName);
             nameLatin = itemView.findViewById(R.id.textView4);
+            waterAmount = itemView.findViewById(R.id.textView6);
             waterTExt = itemView.findViewById(R.id.waterText);
+            location = itemView.findViewById(R.id.location);
             icon = itemView.findViewById(R.id.imageView2);
             fav = itemView.findViewById(R.id.fav);
             hydroMeter = itemView.findViewById(R.id.hydroMeter);
             hydroMeterBg = itemView.findViewById(R.id.hydroMeterBg);
             drop1 = itemView.findViewById(R.id.drop1);
-            drop2 = itemView.findViewById(R.id.drop2);
-            drop3 = itemView.findViewById(R.id.drop3);
             context = itemView.getContext();
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
