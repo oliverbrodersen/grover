@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,7 +23,7 @@ import com.example.grover.Plant;
 import com.example.grover.PlantAdapterRV;
 import com.example.grover.R;
 import com.example.grover.Home;
-import com.example.grover.ui.plantinfo.PlantInfoActivity;
+import com.example.grover.ui.plantinfo.PlantInfoFragment;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -57,13 +58,22 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        Context context = getContext();
-        Class destination = PlantInfoActivity.class;
-
-        Intent intent = new Intent(context, destination);
-
-        intent.putExtra("PlantId", clickedItemIndex);
-        startActivity(intent);
+        //Context context = getContext();
+        //Class destination = PlantInfoFragment.class;
+        //
+        //Intent intent = new Intent(context, destination);
+        //
+        //intent.putExtra("PlantId", clickedItemIndex);
+        //startActivity(intent);
+        FragmentTransaction fragmentTransaction = getActivity()
+                .getSupportFragmentManager().beginTransaction();
+        PlantInfoFragment fragment = new PlantInfoFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("PlantId", clickedItemIndex);
+        fragment.setArguments(bundle);
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.addToBackStack( "tag" );
+        fragmentTransaction.commit();
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override

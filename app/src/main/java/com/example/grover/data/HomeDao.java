@@ -13,11 +13,12 @@ public class HomeDao {
     private MutableLiveData<Home> home;
     private static HomeDao instance;
 
+
     private HomeDao(){
         home = new MutableLiveData<>();
 
         ArrayList<Plant> plants = new ArrayList<>();
-        Plant p1 = new Plant("Fredslilje", "Spathiphyllum", R.drawable.p2, false, 5, "27-03-2021", 3, 0);
+        Plant p1 = new Plant("Fredslilje", "Spathiphyllum", R.drawable.p2, false, 5, "26-03-2021", 3, 0);
         p1.log("Water");
         p1.log("Water");
         p1.log("Fertilizer");

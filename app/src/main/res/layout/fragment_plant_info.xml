@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:background="@color/bg"
     android:layout_height="match_parent"
-    tools:context=".ui.plantinfo.PlantInfoActivity">
+    tools:context=".ui.plantinfo.PlantInfoFragment">
 
     <ScrollView
         android:layout_width="match_parent"
