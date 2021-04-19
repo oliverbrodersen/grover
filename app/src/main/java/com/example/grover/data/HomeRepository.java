@@ -2,7 +2,12 @@ package com.example.grover.data;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.grover.Home;
+import com.example.grover.models.Home;
+import com.example.grover.models.Plant;
+import com.example.grover.models.trefle.TrefleSearchQueryStripped;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class HomeRepository {
     private HomeDao homeDao;
@@ -23,5 +28,30 @@ public class HomeRepository {
 
     public void updateHome(Home home) {
         homeDao.updateHome(home);
+    }
+
+    public void updateTrefleData(Plant plant){
+        homeDao.updateTrefleData(plant);
+    };
+
+    public void addPlant(Plant plant) {
+        homeDao.addPlant(plant);
+    }
+    public Plant getPlantFromName(String name){
+        return homeDao.getPlantFromName(name);
+    }
+    public void searchTrefle(String query) {
+        homeDao.searchTrefle(query);
+    }
+    public LiveData<List<TrefleSearchQueryStripped>> getSearchResult(){
+        return homeDao.getSearchResult();
+    }
+
+    public TrefleSearchQueryStripped selectSearchResult(int index) {
+        return homeDao.selectSearchResult(index);
+    }
+
+    public void clearSearch() {
+        homeDao.clearSearch();
     }
 }

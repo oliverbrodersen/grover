@@ -1,4 +1,4 @@
-package com.example.grover;
+package com.example.grover.models;
 
 import android.content.Context;
 import android.util.TypedValue;
@@ -9,15 +9,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
 
 import java.util.ArrayList;
@@ -48,7 +47,12 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         viewHolder.name.setText(mPlants.get(position).getName());
         viewHolder.nameLatin.setText(mPlants.get(position).getLatinName());
-        viewHolder.icon.setImageResource(mPlants.get(position).getmIconId());
+
+        if (mPlants.get(position).getImgUri() != null)
+            viewHolder.icon.setImageURI(mPlants.get(position).getImgUri());
+        else
+            viewHolder.icon.setImageResource(mPlants.get(position).getmIconId());
+
         viewHolder.waterTExt.setText(mPlants.get(position).waterWhen());
 
         //Add margin top to the first row of cards
@@ -97,10 +101,10 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             viewHolder.hydroMeter.setLayoutParams(new FrameLayout.LayoutParams((int) pixelsToDp(viewHolder, (int) width), (int) pixelsToDp(viewHolder, 15)));
         }
 
-        if (mPlants.get(position).isFavorite())
-            viewHolder.fav.setImageResource(R.drawable.fav);
+        if (mPlants.get(position).getTrefleId() != 0)
+            viewHolder.trefleLogo.setVisibility(View.VISIBLE);
         else
-            viewHolder.fav.setImageResource(R.drawable.not_fav);
+            viewHolder.trefleLogo.setVisibility(View.INVISIBLE);
 
 
 
@@ -127,7 +131,7 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         TextView waterTExt;
         TextView location;
         ImageView icon;
-        ImageView fav;
+        ImageView trefleLogo;
         ImageView drop1;
         CardView card;
         CardView hydroMeter;
@@ -144,10 +148,10 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             waterTExt = itemView.findViewById(R.id.waterText);
             location = itemView.findViewById(R.id.location);
             icon = itemView.findViewById(R.id.imageView2);
-            fav = itemView.findViewById(R.id.fav);
             hydroMeter = itemView.findViewById(R.id.hydroMeter);
             hydroMeterBg = itemView.findViewById(R.id.hydroMeterBg);
             drop1 = itemView.findViewById(R.id.drop1);
+            trefleLogo = itemView.findViewById(R.id.trefle);
             context = itemView.getContext();
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

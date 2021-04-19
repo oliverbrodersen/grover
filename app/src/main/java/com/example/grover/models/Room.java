@@ -1,4 +1,4 @@
-package com.example.grover;
+package com.example.grover.models;
 
 public class Room {
     private String name;

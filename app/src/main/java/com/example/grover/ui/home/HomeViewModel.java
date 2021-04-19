@@ -1,10 +1,9 @@
 package com.example.grover.ui.home;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.grover.Home;
+import com.example.grover.models.Home;
 import com.example.grover.data.HomeRepository;
 
 public class HomeViewModel extends ViewModel {

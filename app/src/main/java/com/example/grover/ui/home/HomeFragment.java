@@ -1,11 +1,7 @@
 package com.example.grover.ui.home;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +15,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grover.Plant;
-import com.example.grover.PlantAdapterRV;
+import com.example.grover.models.Plant;
+import com.example.grover.models.PlantAdapterRV;
 import com.example.grover.R;
-import com.example.grover.Home;
 import com.example.grover.ui.plantinfo.PlantInfoFragment;
 import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
 
 public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemClickListener, PlantAdapterRV.OnListItemLongClickListener {
 
@@ -58,13 +51,6 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        //Context context = getContext();
-        //Class destination = PlantInfoFragment.class;
-        //
-        //Intent intent = new Intent(context, destination);
-        //
-        //intent.putExtra("PlantId", clickedItemIndex);
-        //startActivity(intent);
         FragmentTransaction fragmentTransaction = getActivity()
                 .getSupportFragmentManager().beginTransaction();
         PlantInfoFragment fragment = new PlantInfoFragment();

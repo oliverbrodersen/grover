@@ -1,4 +1,4 @@
-package com.example.grover;
+package com.example.grover.models;
 
 import java.util.Comparator;
 

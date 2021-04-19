@@ -1,11 +1,8 @@
-package com.example.grover;
+package com.example.grover.models;
 
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-
-import com.example.grover.Plant;
 
 import java.util.ArrayList;
 
@@ -60,6 +57,14 @@ public class Home {
         Room room = new Room(name, roomId , id);
         rooms.add(room);
     }
+
+    public ArrayList<Room> getRooms() {
+        return rooms;
+    }
+
+    public void addPlant(Plant plant){
+        plants.add(plant);
+    }
     @RequiresApi(api = Build.VERSION_CODES.N)
     public ArrayList<Plant> getPlantsByWaterNeed(){
         plantsDisplayed = plants;
@@ -74,5 +79,13 @@ public class Home {
                 return r.getName();
         }
         return "";
+    }
+
+    public ArrayList<String> getRoomsList() {
+        ArrayList<String> roomsStrings = new ArrayList<>();
+        for (Room r:rooms) {
+            roomsStrings.add(r.getName());
+        }
+        return roomsStrings;
     }
 }
