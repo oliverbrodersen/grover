@@ -18,4 +18,5 @@ Som bruger vil jeg kunne:
 - C
   - [ ] vælge hvilke privilegier mine venner skal have over mine planter, så jeg eventuelt kan tilføje en samlever
 - W
+  - [ ] Darkmode 
   - [ ] vælge et andet sprog 
