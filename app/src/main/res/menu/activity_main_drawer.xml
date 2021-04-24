@@ -10,24 +10,16 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic__02_male_avatar"
+            android:icon="@drawable/ic__01_home"
             android:title="@string/menu_gallery" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_addplant"
+            android:title="Add new plant" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic__01_friends"
             android:title="@string/menu_slideshow" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_plant"
-            android:title="Add new plant" />
-    </group>
-    <group
-        android:id="@+id/homeGroup"
-        android:checkableBehavior="single">
-        <item
-            android:title="Rooms" />
-        <item
-            android:title="Relocate plants" />
     </group>
     <group
         android:id="@+id/friendGroup"
@@ -41,6 +33,7 @@
         android:id="@+id/accountGroup"
         android:checkableBehavior="single">
         <item android:title="My account" />
-        <item android:title="Log out" />
+        <item android:id="@+id/nav_logout"
+            android:title="Log out" />
     </group>
 </menu>

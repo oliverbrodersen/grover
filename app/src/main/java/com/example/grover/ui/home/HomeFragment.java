@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
     private HomeViewModel viewModel;
     RecyclerView mPlantList;
     PlantAdapterRV mPlantAdapter;
+    ImageView headerColor;
     TextView plantStatus;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -44,7 +46,10 @@ public class HomeFragment extends Fragment implements PlantAdapterRV.OnListItemC
         mPlantList.setAdapter(mPlantAdapter);
 
         plantStatus = root.findViewById(R.id.plantStatus);
+        headerColor = root.findViewById(R.id.imageView4);
+
         plantStatus.setText(viewModel.getHome().getValue().getPlantStatus());
+
 
         return root;
     }

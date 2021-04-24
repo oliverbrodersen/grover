@@ -62,6 +62,15 @@ public class Home {
         return rooms;
     }
 
+    public int getPositionOfRoom(int id){
+        int position = 0;
+        for (int i = 0; i < rooms.size(); i++) {
+            if (rooms.get(i).getHomeId() == id)
+                return position;
+            position++;
+        }
+        return 0;
+    }
     public void addPlant(Plant plant){
         plants.add(plant);
     }
@@ -72,6 +81,17 @@ public class Home {
         return plantsDisplayed;
     }
 
+    public void setPlants(ArrayList<Plant> plants) {
+        this.plants = plants;
+    }
+
+    public Plant getPlantByName(String name){
+        for (Plant p:plants) {
+            if (p.getName().equals(name))
+                return p;
+        }
+        return null;
+    }
     public String getRoomById(int roomId) {
         for (Room r:
              rooms) {
@@ -86,6 +106,7 @@ public class Home {
         for (Room r:rooms) {
             roomsStrings.add(r.getName());
         }
+        roomsStrings.add("Other");
         return roomsStrings;
     }
 }

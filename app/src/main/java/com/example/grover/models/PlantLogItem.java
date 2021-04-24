@@ -18,6 +18,7 @@ public class PlantLogItem {
             case "Water": color = "#afe3ff"; break;
             case "Fertilizer": color = "#58dc71"; break;
             case "Repotting": color = "#b98658"; break;
+            default: color = "#588157";
         }
     }
 
@@ -29,6 +30,7 @@ public class PlantLogItem {
             case "Water": color = "#afe3ff"; break;
             case "Fertilizer": color = "#58dc71"; break;
             case "Repotting": color = "#b98658"; break;
+            default: color = "#588157";
         }
     }
 

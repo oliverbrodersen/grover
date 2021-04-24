@@ -35,7 +35,7 @@ public class HomeDao {
         searchQuery = new MutableLiveData<>();
 
         ArrayList<Plant> plants = new ArrayList<>();
-        Plant p1 = new Plant("Fredslilje", "Spathiphyllum", R.drawable.p2, 5, "17-04-2021", 3, 223320, 0, "Fik den af min farmor");
+        Plant p1 = new Plant("Fredslilje", "Spathiphyllum", R.drawable.p2, 5, "19-04-2021", 3, 223320, 1, "Fik den af min farmor");
         p1.log("Water");
         p1.log("Water");
         p1.log("Fertilizer");
@@ -45,16 +45,16 @@ public class HomeDao {
         p1.log("Water");
         p1.log("Water");
         plants.add(p1);
-        plants.add(new Plant("Philodendron","Philodendron Red Beauty", R.drawable.p1, 14, "29-03-2021", 3, 0, 0, "Aflæs på vandmåleren om den skal vandes inden vanding"));
-        plants.add(new Plant("Cocospalme", "Cocos nucifera", R.drawable.p3, 8, "17-04-2021", 1,122263, 1, "Ikke en kokos plamle"));
-        plants.add(new Plant("Banantræ", "Bananus fantomium", R.drawable.p4, 15,"17-04-2021", 1,0, 0, "Kan ikke dø"));
-        plants.add(new Plant("Trailing Jade", "Bananus fantomium", R.drawable.p5, 15,"17-04-2021", 2,0,0,""));
-        plants.add(new Plant("Nerve plante", "Fittonia", R.drawable.p6, 5,"17-04-2021", 2,196579,0,"Viser når den skal vandes vd at dø"));
-        plants.add(new Plant("Guldranke", "Epipremnum Aureum", R.drawable.p7, 10,"17-04-2021", 2,132809, 0,""));
+        plants.add(new Plant("Philodendron","Philodendron Red Beauty", R.drawable.p1, 14, "29-03-2021", 3, 0, 1, "Aflæs på vandmåleren om den skal vandes inden vanding"));
+        plants.add(new Plant("Cocospalme", "Cocos nucifera", R.drawable.p3, 8, "17-04-2021", 1,122263, 2, "Ikke en kokos plamle"));
+        plants.add(new Plant("Banantræ", "Bananus fantomium", R.drawable.p4, 15,"17-04-2021", 1,0, 1, "Kan ikke dø"));
+        plants.add(new Plant("Trailing Jade", "Bananus fantomium", R.drawable.p5, 15,"17-04-2021", 2,0,1,""));
+        plants.add(new Plant("Nerve plante", "Fittonia", R.drawable.p6, 5,"19-04-2021", 2,196579,1,"Viser når den skal vandes vd at dø"));
+        plants.add(new Plant("Guldranke", "Epipremnum Aureum", R.drawable.p7, 10,"17-04-2021", 2,132809, 1,""));
 
         Home _home = new Home(420, plants);
-        _home.addRoom("Living room", 0);
-        _home.addRoom("Kitchen", 1);
+        _home.addRoom("Living room", 1);
+        _home.addRoom("Kitchen", 2);
         home.setValue(_home);
 
         List<TrefleSearchQueryStripped> sq = new ArrayList<TrefleSearchQueryStripped>();

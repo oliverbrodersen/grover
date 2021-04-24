@@ -1,6 +1,7 @@
 package com.example.grover.ui.addplant;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -31,11 +33,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grover.R;
+import com.example.grover.data.HomeRepository;
+import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
 import com.example.grover.models.TrefleSearchAdapterRV;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
 import com.example.grover.ui.home.HomeFragment;
 import com.example.grover.ui.plantinfo.PlantInfoFragment;
+import com.google.android.material.slider.Slider;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -50,12 +55,16 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
 
     private AddPlantViewModel galleryViewModel;
     final Calendar myCalendar = Calendar.getInstance();
+    private boolean edit;
     private Plant newPlant;
-    private EditText edittext, name, species, daysBetweenWater, waterAmount, notes;
+    private EditText edittext, name, species, daysBetweenWater, notes, etOtherLocation;
+    private Slider waterAmount;
     private ImageView pPhotoView;
     private CardView cardLoad;
-    private Button createButton;
+    private TextView tvOtherLocation;
+    private Button createButton, bOtherLocation;
     private RecyclerView trefleSearchList;
+    private Spinner spin;
     private TrefleSearchAdapterRV trefleSearchAdapter;
     private int trefleIdPlaceholder = 0;
     private static final int RESULT_CODE_IMAGE = 1;
@@ -72,7 +81,47 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         waterAmount = root.findViewById(R.id.editTextNumber);
         notes = root.findViewById(R.id.editTextTextMultiLine2);
         createButton = root.findViewById(R.id.button2);
-        newPlant = new Plant();
+        tvOtherLocation = root.findViewById(R.id.textView106);
+        etOtherLocation = root.findViewById(R.id.editTextOtherLocation);
+        bOtherLocation = root.findViewById(R.id.buttonOtherLocation);
+        pPhotoView = (ImageView) root.findViewById(R.id.imageView8);
+        cardLoad = (CardView) root.findViewById(R.id.cardView2);
+        edit = false;
+
+        //Getting the instance of Spinner and applying OnItemSelectedListener on it
+        spin = (Spinner) root.findViewById(R.id.spinner);
+        spin.setOnItemSelectedListener(this);
+
+        //Creating the ArrayAdapter instance having the country list
+        ArrayAdapter aa = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_item,galleryViewModel.getHome().getValue().getRoomsList());
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(aa);
+        int plantId = -1;
+        if (this.getArguments() != null){
+            plantId = this.getArguments().getInt("PlantId");
+        }
+
+        if (plantId >= 0) {
+            edit = true;
+            newPlant = HomeRepository.getInstance().getHome().getValue().getPlantsDisplayed().get(plantId);
+            Log.d("test", newPlant.getName());
+            if (newPlant.getImgUri() != null)
+                pPhotoView.setImageURI(newPlant.getImgUri());
+            else
+                pPhotoView.setImageResource(newPlant.getmIconId());
+            name.setText(newPlant.getName());
+            species.setText(newPlant.getLatinName());
+            daysBetweenWater.setText("" + (int) newPlant.getDaysBetweenWater());
+            waterAmount.setValue(newPlant.getWaterLevel());
+            notes.setText(newPlant.getNote());
+            createButton.setText("Save");
+            spin.setSelection(galleryViewModel.getHome().getValue().getPositionOfRoom(newPlant.getRoomId()));
+        }
+        else {
+            newPlant = new Plant();
+            createButton.setText("Create");
+        }
 
         edittext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,10 +133,11 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         });
         createButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                closeKeyboard();
                 newPlant.setName(name.getText().toString());
                 newPlant.setLatinName(species.getText().toString());
                 newPlant.setDaysBetweenWater(Integer.parseInt(String.valueOf(daysBetweenWater.getText())));
-                newPlant.setWaterLevel(Integer.parseInt(waterAmount.getText().toString()));
+                newPlant.setWaterLevel((int) waterAmount.getValue());
                 newPlant.setNote(notes.getText().toString());
                 newPlant.setTrefleId(trefleIdPlaceholder);
                 galleryViewModel.addPlant(newPlant);
@@ -98,9 +148,7 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
                 fragmentTransaction.commit();
             }
         });
-        pPhotoView = (ImageView) root.findViewById(R.id.imageView8);
         pPhotoView.setOnClickListener(this);
-        cardLoad = (CardView) root.findViewById(R.id.cardView2);
         cardLoad.setCardBackgroundColor(getResources().getColor(R.color.image_load_idle));
 
         //Trefle lookup init
@@ -140,16 +188,31 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
             }
         });
 
-        //Getting the instance of Spinner and applying OnItemSelectedListener on it
-        Spinner spin = (Spinner) root.findViewById(R.id.spinner);
-        spin.setOnItemSelectedListener(this);
+        tvOtherLocation.setVisibility(View.GONE);
+        etOtherLocation.setVisibility(View.GONE);
+        bOtherLocation.setVisibility(View.GONE);
 
-        //Creating the ArrayAdapter instance having the country list
-        ArrayAdapter aa = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_item,galleryViewModel.getHome().getValue().getRoomsList());
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //Setting the ArrayAdapter data on the Spinner
-        spin.setAdapter(aa);
 
+
+
+        bOtherLocation.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                closeKeyboard();
+                Home home = galleryViewModel.getHome().getValue();
+                home.addRoom(etOtherLocation.getText().toString());
+                galleryViewModel.updateHome(home);
+
+                //Creating the ArrayAdapter instance having the country list
+                ArrayAdapter aa = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_item,home.getRoomsList());
+                aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                //Setting the ArrayAdapter data on the Spinner
+                spin.setAdapter(aa);
+
+                spin.setSelection(home.getRooms().size()-1);
+
+                newPlant.setRoomId(galleryViewModel.getHome().getValue().getRooms().get(galleryViewModel.getHome().getValue().getRooms().size()-1).getRoomId());
+            }
+        });
         return root;
     }
     private void updateLabel() {
@@ -199,11 +262,45 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        newPlant.setRoomId(galleryViewModel.getHome().getValue().getRooms().get(position).getRoomId());
+        Log.d("grover", position + "");
+        if (position == galleryViewModel.getHome().getValue().getRooms().size()){
+            tvOtherLocation.setVisibility(View.VISIBLE);
+            etOtherLocation.setVisibility(View.VISIBLE);
+            bOtherLocation.setVisibility(View.VISIBLE);
+        }
+        else{
+            tvOtherLocation.setVisibility(View.GONE);
+            etOtherLocation.setVisibility(View.GONE);
+             bOtherLocation.setVisibility(View.GONE);
+            newPlant.setRoomId(galleryViewModel.getHome().getValue().getRooms().get(position).getRoomId());
+        }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+    private void closeKeyboard()
+    {
+        // this will give us the view
+        // which is currently focus
+        // in this layout
+        View view = getActivity().getCurrentFocus();
+
+        // if nothing is currently
+        // focus then this will protect
+        // the app from crash
+        if (view != null) {
+
+            // now assign the system
+            // service to InputMethodManager
+            InputMethodManager manager
+                    = (InputMethodManager)
+                    getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+            manager
+                    .hideSoftInputFromWindow(
+                            view.getWindowToken(), 0);
+        }
     }
 }

@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,15 +16,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
 import com.example.grover.models.PlantLogAdapterRV;
 import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
 import com.example.grover.models.trefle.trefleSpeciesComplete.Data;
+import com.example.grover.ui.addplant.AddPlantFragment;
+
+import java.util.ArrayList;
 
 public class PlantInfoFragment extends Fragment {
     private PlantInfoViewModel viewModel;
@@ -46,13 +53,13 @@ public class PlantInfoFragment extends Fragment {
             Log.d("tag", p.getName());
         }
         else if (plantId >= 0) {
-
-            recyclerView = root.findViewById(R.id.rv);
-            recyclerView.hasFixedSize();
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
             p = HomeRepository.getInstance().getHome().getValue().getPlantsDisplayed().get(plantId);
         }
+
+        recyclerView = root.findViewById(R.id.rv);
+        recyclerView.hasFixedSize();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
             plantLogAdapterRV = new PlantLogAdapterRV(p.getLog());
             recyclerView.setAdapter(plantLogAdapterRV);
 
@@ -72,6 +79,8 @@ public class PlantInfoFragment extends Fragment {
             CardView trefleCard = root.findViewById(R.id.cardView6);
             CardView notesCard = root.findViewById(R.id.cardViewNotes);
             CardView currentCardView = root.findViewById(R.id.cardView3);
+            CardView waterButton = root.findViewById(R.id.waterButton);
+            CardView editButton = root.findViewById(R.id.editButton);
 
             //Trefle
             TextView commonName = root.findViewById(R.id.commonName);
@@ -96,6 +105,31 @@ public class PlantInfoFragment extends Fragment {
             waterAmount.setText(p.getWaterLevel() + "x");
             waterInDays.setText((int) p.getDaysBetweenWater() + " days");
             daysTillWater.setText(p.waterWhen());
+            waterButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Home h = viewModel.getHome().getValue();
+                    ArrayList<Plant> plantArrayList = h.getPlants();
+                    for (Plant plant:plantArrayList) {
+                        if (plant.getName().equals(p.getName()))
+                        {
+                            plant.water();
+                            break;
+                        }
+                    }
+                    h.setPlants(plantArrayList);
+                    viewModel.updateHome(h);
+
+
+                    FragmentTransaction fragmentTransaction = getActivity()
+                            .getSupportFragmentManager().beginTransaction();
+                    PlantInfoFragment fragment = new PlantInfoFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("PlantName", p.getName());
+                    fragment.setArguments(bundle);
+                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                    fragmentTransaction.commit();
+                }
+            });
 
             if (p.getTrefleId() != 0){
                 //trefle.setText(p.getTreflePlantInfo().getFamily_common_name());
@@ -181,7 +215,22 @@ public class PlantInfoFragment extends Fragment {
                 }
             }
 
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction fragmentTransaction = getActivity()
+                        .getSupportFragmentManager().beginTransaction();
+                AddPlantFragment fragment = new AddPlantFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("PlantId", viewModel.getHome().getValue().getPlantIndex(p));
+                fragment.setArguments(bundle);
+                fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                fragmentTransaction.addToBackStack( "tag" );
+                fragmentTransaction.commit();
 
+
+            }
+        });
 
         return root;
     }

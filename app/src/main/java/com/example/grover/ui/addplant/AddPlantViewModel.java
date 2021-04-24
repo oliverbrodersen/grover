@@ -40,6 +40,9 @@ public class AddPlantViewModel extends ViewModel {
         return repository.selectSearchResult(index);
     }
 
+    public void updateHome(Home home){
+        repository.updateHome(home);
+    }
     public void clearSearch() {
         repository.clearSearch();
     }
