@@ -13,6 +13,7 @@ import com.example.grover.models.trefle.TreflePlant;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
 import com.example.grover.models.trefle.trefleSpeciesComplete.Data;
 import com.example.grover.models.trefle.trefleSpeciesComplete.Root;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,6 +28,7 @@ import retrofit2.Response;
 public class HomeDao {
     private MutableLiveData<Home> home;
     private MutableLiveData<List<TrefleSearchQueryStripped>> searchQuery;
+    private FirebaseUser user;
     private static HomeDao instance;
 
 
@@ -164,5 +166,12 @@ public class HomeDao {
     public void clearSearch() {
         ArrayList<TrefleSearchQueryStripped> tpList = new ArrayList<>();
         searchQuery.setValue(tpList);
+    }
+
+    public void setUser(FirebaseUser user) {
+        this.user = user;
+    }
+    public FirebaseUser getUser(){
+        return user;
     }
 }

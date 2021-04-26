@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "920878125602",
+    "firebase_url": "https://grover-64fc6-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "grover-64fc6",
+    "storage_bucket": "grover-64fc6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920878125602:android:f9618b7f376ad802c0707b",
+        "android_client_info": {
+          "package_name": "com.example.grover"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "920878125602-fg7ldh3pibm56e4h2hj9dcfbd4uci0me.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjrJgyQwZScZAQN6zu5pVprfHE61s2AkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "920878125602-fg7ldh3pibm56e4h2hj9dcfbd4uci0me.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

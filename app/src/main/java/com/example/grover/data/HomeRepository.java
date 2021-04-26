@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -33,6 +34,13 @@ public class HomeRepository {
     public void updateTrefleData(Plant plant){
         homeDao.updateTrefleData(plant);
     };
+
+    public void setUser(FirebaseUser user){
+        homeDao.setUser(user);
+    }
+    public FirebaseUser getUser(){
+        return homeDao.getUser();
+    }
 
     public void addPlant(Plant plant) {
         homeDao.addPlant(plant);
