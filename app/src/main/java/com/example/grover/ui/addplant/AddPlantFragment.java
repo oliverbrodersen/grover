@@ -1,6 +1,7 @@
 package com.example.grover.ui.addplant;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -32,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
 import com.example.grover.models.Home;
@@ -40,14 +42,23 @@ import com.example.grover.models.TrefleSearchAdapterRV;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
 import com.example.grover.ui.home.HomeFragment;
 import com.example.grover.ui.plantinfo.PlantInfoFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.slider.Slider;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -55,8 +66,10 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
 
     private AddPlantViewModel galleryViewModel;
     final Calendar myCalendar = Calendar.getInstance();
+    private StorageReference mStorageRef;
     private boolean edit;
-    private Plant newPlant;
+    private String imageId;
+    private Plant newPlant, oldPlant;
     private EditText edittext, name, species, daysBetweenWater, notes, etOtherLocation;
     private Slider waterAmount;
     private ImageView pPhotoView;
@@ -87,6 +100,9 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         pPhotoView = (ImageView) root.findViewById(R.id.imageView8);
         cardLoad = (CardView) root.findViewById(R.id.cardView2);
         edit = false;
+            imageId = UUID.randomUUID().toString() + ".jpg";
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         //Getting the instance of Spinner and applying OnItemSelectedListener on it
         spin = (Spinner) root.findViewById(R.id.spinner);
@@ -97,19 +113,36 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(aa);
-        int plantId = -1;
+        String plantId = null;
         if (this.getArguments() != null){
-            plantId = this.getArguments().getInt("PlantId");
+            plantId = this.getArguments().getString("PlantId");
         }
-
-        if (plantId >= 0) {
+        if (this.getArguments() != null) {
             edit = true;
-            newPlant = HomeRepository.getInstance().getHome().getValue().getPlantsDisplayed().get(plantId);
+            plantId = this.getArguments().getString("PlantId");
+            newPlant = HomeRepository.getInstance().getHome().getValue().getPlantById(plantId);
+            oldPlant = newPlant;
             Log.d("test", newPlant.getName());
-            if (newPlant.getImgUri() != null)
-                pPhotoView.setImageURI(newPlant.getImgUri());
-            else
-                pPhotoView.setImageResource(newPlant.getmIconId());
+
+            //Download and view image
+            StorageReference ref = FirebaseStorage.getInstance().getReference();
+            ref.child("images/" + newPlant.getImageId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    // Got the download URL for 'users/me/profile.png'
+                    //viewHolder.icon.setImageURI(uri);
+                    Glide.with(getContext())
+                            .load(uri)
+                            .into(pPhotoView);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.e("tag", exception.toString());
+                }
+            });
+
             name.setText(newPlant.getName());
             species.setText(newPlant.getLatinName());
             daysBetweenWater.setText("" + (int) newPlant.getDaysBetweenWater());
@@ -120,6 +153,7 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         }
         else {
             newPlant = new Plant();
+            newPlant.setPlantId(UUID.randomUUID().toString());
             createButton.setText("Create");
         }
 
@@ -139,8 +173,13 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
                 newPlant.setDaysBetweenWater(Integer.parseInt(String.valueOf(daysBetweenWater.getText())));
                 newPlant.setWaterLevel((int) waterAmount.getValue());
                 newPlant.setNote(notes.getText().toString());
-                newPlant.setTrefleId(trefleIdPlaceholder);
-                galleryViewModel.addPlant(newPlant);
+                if (!edit){
+                    newPlant.setImageId(imageId);
+                    newPlant.setTrefleId(trefleIdPlaceholder);
+                    uploadImage();
+                }
+                galleryViewModel.addPlant(newPlant, oldPlant);
+
                 FragmentTransaction fragmentTransaction = getActivity()
                         .getSupportFragmentManager().beginTransaction();
                 HomeFragment fragment = new HomeFragment();
@@ -161,6 +200,7 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
 
         galleryViewModel.clearSearch();
 
+        //Listen to incomming searches
         galleryViewModel.getSearchResult().observe(getActivity(), new Observer<List<TrefleSearchQueryStripped>>() {
             @Override
             public void onChanged(List<TrefleSearchQueryStripped> trefleSearchQueryStrippeds) {
@@ -192,9 +232,6 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         etOtherLocation.setVisibility(View.GONE);
         bOtherLocation.setVisibility(View.GONE);
 
-
-
-
         bOtherLocation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 closeKeyboard();
@@ -215,6 +252,37 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         });
         return root;
     }
+
+    private void uploadImage() {
+        final ProgressDialog pd = new ProgressDialog(getContext());
+        pd.setTitle("Uploading image...");
+        pd.show();
+
+        StorageReference riversRef = mStorageRef.child("images/" + imageId);
+        riversRef.putFile(newPlant.getImageUri())
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        pd.dismiss();
+                        Snackbar.make(getActivity().findViewById(R.id.nav_view), "Image uploaded", Snackbar.LENGTH_SHORT);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        pd.dismiss();
+                        Snackbar.make(getActivity().findViewById(R.id.nav_view), "Image didn't upload", Snackbar.LENGTH_SHORT);
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                        double progressPercent = (100 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        pd.setTitle("Progress: " + (int)progressPercent + "%");
+                    }
+            });
+    }
+
     private void updateLabel() {
         String myFormat = "dd/MM/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.GERMAN);

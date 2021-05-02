@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.grover.data.HomeRepository;
+import com.example.grover.models.Home;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -60,23 +62,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        //Update users info in navheader
-        View headerView = navigationView.getHeaderView(0);
-        TextView userNameTag = (TextView) headerView.findViewById(R.id.textView3);
-        userNameTag.setText("Hi, " + HomeRepository.getInstance().getUser().getDisplayName());
-
-        TextView userTag = (TextView) headerView.findViewById(R.id.textView);
-        userTag.setText("and your " + HomeRepository.getInstance().getHome().getValue().getPlants().size() + " plants");
-
-        ImageView profilePic = headerView.findViewById(R.id.imageView);
-        Glide.with(headerView).load(HomeRepository.getInstance().getUser().getPhotoUrl()).into(profilePic);
-
-
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        navigationView.setNavigationItemSelectedListener(this);
+        HomeRepository.getInstance().getHome().observe(this, new Observer<Home>() {
+            @Override
+            public void onChanged(Home home) {
+                //Update users info in navheader
+                View headerView = navigationView.getHeaderView(0);
+                TextView userNameTag = (TextView) headerView.findViewById(R.id.textView3);
+                userNameTag.setText("Hi, " + HomeRepository.getInstance().getUser().getDisplayName());
+
+                TextView userTag = (TextView) headerView.findViewById(R.id.textView);
+                if (HomeRepository.getInstance().getHome().getValue().getPlants() == null)
+                    userTag.setText("and your 0 plants");
+                else
+                    userTag.setText("and your " + HomeRepository.getInstance().getHome().getValue().getPlants().size() + " plants");
+
+                ImageView profilePic = headerView.findViewById(R.id.imageView);
+                Glide.with(headerView).load(HomeRepository.getInstance().getUser().getPhotoUrl()).into(profilePic);
+            }
+        });
+
+        //navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override

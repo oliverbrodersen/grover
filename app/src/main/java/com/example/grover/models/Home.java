@@ -12,6 +12,16 @@ public class Home {
     private ArrayList<Plant> plantsDisplayed;
     private ArrayList<Room> rooms;
 
+    public Home(FirebaseHome ref){
+        id = ref.getHomeId();
+        rooms = (ArrayList<Room>) ref.getRooms();
+        plants = new ArrayList<>();
+        for (FirebasePlant firebasePlant : ref.getPlants()){
+            plants.add(new Plant(firebasePlant));
+        }
+        plantsDisplayed = plants;
+    }
+
     public Home(int id, ArrayList<Plant> plants) {
         this.id = id;
         this.plants = plants;
@@ -33,6 +43,18 @@ public class Home {
 
     public ArrayList<Plant> getPlantsDisplayed() {
         return plantsDisplayed;
+    }
+
+    public FirebaseHome getAsFirebaseHome(){
+        FirebaseHome firebaseHome = new FirebaseHome();
+        ArrayList<FirebasePlant> firebasePlantArrayList = new ArrayList<>();
+        for(Plant plant : plants){
+            firebasePlantArrayList.add(plant.getAsFirebasePlant());
+        }
+        firebaseHome.setHomeId(id);
+        firebaseHome.setRooms(rooms);
+        firebaseHome.setPlants(firebasePlantArrayList);
+        return firebaseHome;
     }
 
     public String getPlantStatus(){
@@ -108,5 +130,17 @@ public class Home {
         }
         roomsStrings.add("Other");
         return roomsStrings;
+    }
+
+    public Plant getPlantById(String plantId) {
+        for (Plant plant : plants){
+            if (plant.getPlantId().equals(plantId))
+                return plant;
+        }
+        return null;
+    }
+
+    public void editPlant(Plant newPlant, Plant oldPlant) {
+        getPlantById(newPlant.getPlantId()).update(oldPlant);
     }
 }

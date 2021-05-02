@@ -1,14 +1,13 @@
 package com.example.grover.ui.plantinfo;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,17 +20,21 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
 import com.example.grover.models.PlantLogAdapterRV;
 import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
-import com.example.grover.models.trefle.trefleSpeciesComplete.Data;
 import com.example.grover.ui.addplant.AddPlantFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
-public class PlantInfoFragment extends Fragment {
+public class PlantInfoFragment extends Fragment implements PlantLogAdapterRV.OnListItemClickListener {
     private PlantInfoViewModel viewModel;
     RecyclerView recyclerView;
     PlantLogAdapterRV plantLogAdapterRV;
@@ -45,22 +48,14 @@ public class PlantInfoFragment extends Fragment {
                 new ViewModelProvider(this).get(PlantInfoViewModel.class);
         View root = inflater.inflate(R.layout.fragment_plant_info, container, false);
 
-        int plantId = this.getArguments().getInt("PlantId");
-        String plantName = this.getArguments().getString("PlantName");
-
-        if (plantName != null){
-            p = viewModel.getPlantFromName(plantName);
-            Log.d("tag", p.getName());
-        }
-        else if (plantId >= 0) {
-            p = HomeRepository.getInstance().getHome().getValue().getPlantsDisplayed().get(plantId);
-        }
+        String plantId = this.getArguments().getString("PlantId");
+        p = HomeRepository.getInstance().getHome().getValue().getPlantById(plantId);
 
         recyclerView = root.findViewById(R.id.rv);
         recyclerView.hasFixedSize();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            plantLogAdapterRV = new PlantLogAdapterRV(p.getLog());
+            plantLogAdapterRV = new PlantLogAdapterRV(p.getLog(), this);
             recyclerView.setAdapter(plantLogAdapterRV);
 
             ImageView image = root.findViewById(R.id.imageView8);
@@ -92,12 +87,24 @@ public class PlantInfoFragment extends Fragment {
             TextView family = root.findViewById(R.id.family);
             TextView familyLable = root.findViewById(R.id.lableFamily);
 
-
-
-            if (p.getImgUri() != null)
-                image.setImageURI(p.getImgUri());
-            else
-                image.setImageResource(p.getmIconId());
+            //Download and view image
+            StorageReference ref = FirebaseStorage.getInstance().getReference();
+            ref.child("images/" + p.getImageId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    // Got the download URL for 'users/me/profile.png'
+                    //viewHolder.icon.setImageURI(uri);
+                    Glide.with(getContext())
+                            .load(uri)
+                            .into(image);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.e("tag", exception.toString());
+                }
+            });
 
             name.setText(p.getName());
             latinName.setText(p.getLatinName());
@@ -131,7 +138,7 @@ public class PlantInfoFragment extends Fragment {
                 }
             });
 
-            if (p.getTrefleId() != 0){
+            if (p.getTrefleId() != 0 && p.getTreflePlantInfo() != null){
                 //trefle.setText(p.getTreflePlantInfo().getFamily_common_name());
                 trefleHeader.setVisibility(View.VISIBLE);
                 trefleCard.setVisibility(View.VISIBLE);
@@ -222,16 +229,19 @@ public class PlantInfoFragment extends Fragment {
                         .getSupportFragmentManager().beginTransaction();
                 AddPlantFragment fragment = new AddPlantFragment();
                 Bundle bundle = new Bundle();
-                bundle.putInt("PlantId", viewModel.getHome().getValue().getPlantIndex(p));
+                bundle.putString("PlantId", p.getPlantId());
                 fragment.setArguments(bundle);
                 fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
                 fragmentTransaction.addToBackStack( "tag" );
                 fragmentTransaction.commit();
-
-
             }
         });
 
         return root;
+    }
+
+    @Override
+    public void OnClickListener(int clickedItemIndex) {
+        Log.d("log", "Long pressed: " + p.getLog().get(clickedItemIndex));
     }
 }

@@ -25,8 +25,8 @@ public class AddPlantViewModel extends ViewModel {
         return repository.getHome();
     }
 
-    public void addPlant(Plant plant){
-        repository.addPlant(plant);
+    public void addPlant(Plant newPlant, Plant oldPlant){
+        repository.addPlant(newPlant, oldPlant);
     }
 
     public void searchTrefle(String query) {

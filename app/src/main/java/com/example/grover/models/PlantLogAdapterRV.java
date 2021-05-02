@@ -15,11 +15,13 @@ import com.example.grover.R;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class PlantLogAdapterRV extends RecyclerView.Adapter<ViewHolder> {
+public class PlantLogAdapterRV extends RecyclerView.Adapter<PlantLogAdapterRV.ViewHolder> {
     private ArrayList<PlantLogItem> log;
+    final private PlantLogAdapterRV.OnListItemClickListener mOnListItemClickListener;
 
-    public PlantLogAdapterRV(ArrayList<PlantLogItem> log) {
+    public PlantLogAdapterRV(ArrayList<PlantLogItem> log, PlantLogAdapterRV.OnListItemClickListener mOnListItemClickListener) {
         this.log = log;
+        this.mOnListItemClickListener = mOnListItemClickListener;
         Collections.reverse(this.log);
     }
 
@@ -35,6 +37,10 @@ public class PlantLogAdapterRV extends RecyclerView.Adapter<ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         viewHolder.text.setText(log.get(position).toString());
         viewHolder.color.setCardBackgroundColor(Color.parseColor(log.get(position).getColor()));
+        viewHolder.d1.setVisibility(View.VISIBLE);
+        viewHolder.d2.setVisibility(View.VISIBLE);
+        viewHolder.d3.setVisibility(View.VISIBLE);
+        viewHolder.d4.setVisibility(View.VISIBLE);
         if (position == 0){
             viewHolder.d3.setVisibility(View.INVISIBLE);
             viewHolder.d4.setVisibility(View.INVISIBLE);
@@ -43,29 +49,47 @@ public class PlantLogAdapterRV extends RecyclerView.Adapter<ViewHolder> {
             viewHolder.d1.setVisibility(View.INVISIBLE);
             viewHolder.d2.setVisibility(View.INVISIBLE);
         }
+        if (log.get(position).getNote() != null){
+            viewHolder.note.setVisibility(View.VISIBLE);
+            viewHolder.note.setText(log.get(position).getNote());
+        }
+        else {
+            viewHolder.note.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public int getItemCount() {
         return log.size();
     }
-}
-class ViewHolder extends RecyclerView.ViewHolder {
 
-    CardView color;
-    TextView text;
-    View d1;
-    View d2;
-    View d3;
-    View d4;
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-    ViewHolder(View itemView) {
-        super(itemView);
-        color = itemView.findViewById(R.id.color);
-        text = itemView.findViewById(R.id.textDate);
-        d1 = itemView.findViewById(R.id.divider2);
-        d2 = itemView.findViewById(R.id.divider3);
-        d3 = itemView.findViewById(R.id.divider4);
-        d4 = itemView.findViewById(R.id.divider5);
+        CardView color;
+        TextView text;
+        TextView note;
+        View d1;
+        View d2;
+        View d3;
+        View d4;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            color = itemView.findViewById(R.id.color);
+            text = itemView.findViewById(R.id.textDate);
+            note = itemView.findViewById(R.id.note);
+            d1 = itemView.findViewById(R.id.divider2);
+            d2 = itemView.findViewById(R.id.divider3);
+            d3 = itemView.findViewById(R.id.divider4);
+            d4 = itemView.findViewById(R.id.divider5);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mOnListItemClickListener.OnClickListener(getAdapterPosition());
+        }
+    }
+    public interface OnListItemClickListener {
+        void OnClickListener(int clickedItemIndex);
     }
 }

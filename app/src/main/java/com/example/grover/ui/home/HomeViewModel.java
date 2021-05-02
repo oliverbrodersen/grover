@@ -20,4 +20,8 @@ public class HomeViewModel extends ViewModel {
     public void updateHome(Home home){
         repository.updateHome(home);
     }
+
+    public void updateDatabase() {
+        repository.updateDatabase();
+    }
 }

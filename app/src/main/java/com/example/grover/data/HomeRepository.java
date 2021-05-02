@@ -42,8 +42,8 @@ public class HomeRepository {
         return homeDao.getUser();
     }
 
-    public void addPlant(Plant plant) {
-        homeDao.addPlant(plant);
+    public void addPlant(Plant newPlant, Plant oldPlant) {
+        homeDao.addPlant(newPlant, oldPlant);
     }
     public Plant getPlantFromName(String name){
         return homeDao.getPlantFromName(name);
@@ -61,5 +61,9 @@ public class HomeRepository {
 
     public void clearSearch() {
         homeDao.clearSearch();
+    }
+
+    public void updateDatabase() {
+        homeDao.updateDatabase();
     }
 }

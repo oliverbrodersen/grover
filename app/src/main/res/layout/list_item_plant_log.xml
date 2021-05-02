@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="wrap_content">
 
 
     <androidx.cardview.widget.CardView
@@ -19,16 +19,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-     <TextView
+    <TextView
         android:id="@+id/textDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="13dp"
         android:fontFamily="@font/varela_round"
         android:text="TextView"
         android:textColor="#5e5f5e"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/color"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,11 +36,11 @@
         android:id="@+id/divider2"
         android:layout_width="3dp"
         android:layout_height="6dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:background="#a8d7a5"
+        app:layout_constraintBottom_toTopOf="@+id/divider3"
         app:layout_constraintEnd_toEndOf="@+id/color"
-        app:layout_constraintStart_toStartOf="@+id/color"
-        app:layout_constraintTop_toBottomOf="@+id/color" />
+        app:layout_constraintStart_toStartOf="@+id/color" />
 
     <View
         android:id="@+id/divider3"
@@ -51,15 +51,16 @@
         app:layout_constraintEnd_toEndOf="@+id/color"
         app:layout_constraintStart_toStartOf="@+id/color" />
 
+
     <View
         android:id="@+id/divider4"
         android:layout_width="3dp"
         android:layout_height="6dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginTop="7dp"
         android:background="#a8d7a5"
-        app:layout_constraintBottom_toTopOf="@+id/color"
         app:layout_constraintEnd_toEndOf="@+id/color"
-        app:layout_constraintStart_toStartOf="@+id/color" />
+        app:layout_constraintStart_toStartOf="@+id/color"
+        app:layout_constraintTop_toTopOf="@+id/divider5" />
 
     <View
         android:id="@+id/divider5"
@@ -69,4 +70,19 @@
         app:layout_constraintEnd_toEndOf="@+id/color"
         app:layout_constraintStart_toStartOf="@+id/color"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="@+id/textDate"
+        app:layout_constraintTop_toBottomOf="@+id/textDate" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

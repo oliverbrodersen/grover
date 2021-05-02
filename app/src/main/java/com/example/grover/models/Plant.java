@@ -3,11 +3,21 @@ package com.example.grover.models;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
 import com.example.grover.data.ServiceGenerator;
 import com.example.grover.data.TrefleApi;
 import com.example.grover.models.trefle.trefleSpeciesComplete.Data;
 import com.example.grover.models.trefle.trefleSpeciesComplete.Root;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,17 +38,20 @@ public class Plant {
 
     private int mIconId;
     private int roomId;
-    private Uri imgUri;
+    private String imageId;
 
     //Don't need
+    private String plantId;
     private String lastWaterDate;
     private String lastWaterDateUndo;
     private SimpleDateFormat sdf;
     private ArrayList<PlantLogItem> log;
     private int trefleId;
     private Data treflePlantInfo;
+    private Uri imageUri;
 
-    public Plant(String name, String latinName, int mIconId, double daysBetweenWater, String lastWater, int waterLevel, int trefleId, int roomId, String note) {
+    public Plant(String plantId, String name, String latinName, int mIconId, double daysBetweenWater, String lastWater, int waterLevel, int trefleId, int roomId, String note, String imageId) {
+        this.plantId = plantId;
         this.name = name;
         this.latinName = latinName;
         this.mIconId = mIconId;
@@ -49,6 +62,7 @@ public class Plant {
         this.roomId = roomId;
         this.trefleId = trefleId;
         this.note = note;
+        this.imageId = imageId;
         log = new ArrayList<>();
         sdf= new SimpleDateFormat("dd-M-yyyy");
         treflePlantInfo = getTreflePlantInfo();
@@ -60,6 +74,7 @@ public class Plant {
         this.daysBetweenWater = -1;
         this.waterLevel = -1;
         this.roomId = -1;
+        this.imageId = null;
         note = null;
         this.trefleId = 0;
         log = new ArrayList<>();
@@ -69,12 +84,43 @@ public class Plant {
         treflePlantInfo = getTreflePlantInfo();
     }
 
-    public Uri getImgUri() {
-        return imgUri;
+    public Plant(FirebasePlant ref) {
+        this.plantId = ref.getId();
+        this.name = ref.getName();
+        this.latinName = ref.getLatinName();
+        this.mIconId = -1;
+        this.daysBetweenWater = ref.getDaysBetweenWater();
+        this.lastWaterDate = ref.getLastWaterDate();
+        lastWaterDateUndo = ref.getLastWaterDate();
+        imageId = ref.getImageId();
+        this.waterLevel = ref.getWaterLevel();
+        this.roomId = ref.getRoomId();
+        this.trefleId = ref.getTrefleId();
+        this.note = ref.getNote();
+        log = (ArrayList<PlantLogItem>) ref.getLog();
+        sdf= new SimpleDateFormat("dd-M-yyyy");
+        treflePlantInfo = getTreflePlantInfo();
     }
 
-    public void setImgUri(Uri imgUri) {
-        this.imgUri = imgUri;
+    public FirebasePlant getAsFirebasePlant(){
+        FirebasePlant firebasePlant = new FirebasePlant(plantId, name, latinName, note, lastWaterDate, waterLevel, (int) daysBetweenWater, roomId, trefleId, log, imageId);
+        return firebasePlant;
+    }
+
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
+    }
+
+    public String getPlantId() {
+        return plantId;
+    }
+
+    public void setPlantId(String plantId) {
+        this.plantId = plantId;
     }
 
     public SimpleDateFormat getSdf() {
@@ -131,13 +177,12 @@ public class Plant {
                 public void onResponse(Call<Root> call, Response<Root> response) {
                     if (response.code() == 200) {
                         setTreflePlantInfo(response.body().data);
-                        Log.d("Trefle","get " + name + " success");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Root> call, Throwable t) {
-                    Log.i("Retrofit", "Something went wrong :(");
+                    Log.i("Retrofit", "Failed to get plant data from trefle.io: " + t.toString());
                 }
             });
         }
@@ -185,8 +230,8 @@ public class Plant {
         log("Water");
     }
 
-    public void undoWater(){
-        lastWaterDate = lastWaterDateUndo;
+    public void undoWater(String lastWater){
+        lastWaterDate = lastWater;
         log.remove(log.size()-1);
     }
 
@@ -253,5 +298,37 @@ public class Plant {
     public void setTrefleId(int trefleId) {
         this.trefleId = trefleId;
         treflePlantInfo = getTreflePlantInfo();
+    }
+
+    public Uri getImageUri() {
+        return imageUri;
+    }
+
+    public void setImgUri(Uri selectedImage) {
+        imageUri = selectedImage;
+    }
+
+    public void update(Plant plant) {
+        String changes = "";
+        //Log.d("test", "old: " + this.name + ", new: " + plant.getName());
+
+        if (!this.name.equals(plant.name))
+            changes += " Name,";
+        if (!this.latinName.equals(plant.latinName))
+            changes += " Latin Name,";
+        if (!this.note.equals(plant.note))
+            changes += " Note,";
+        if (!this.imageId.equals(plant.imageId))
+            changes += " Image,";
+        if (this.waterLevel != plant.waterLevel)
+            changes += " Water level,";
+        if (this.daysBetweenWater != plant.daysBetweenWater)
+            changes += " Days between water,";
+        if (this.trefleId != plant.trefleId)
+            changes += " Trefle API pair,";
+
+        PlantLogItem logItem = new PlantLogItem("Update");
+        logItem.setNote("Changes has been made to:" + changes);
+        log(logItem);
     }
 }

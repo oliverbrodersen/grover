@@ -1,6 +1,8 @@
 package com.example.grover.models;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -10,15 +12,30 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHolder> {
@@ -26,6 +43,9 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
     private ArrayList<Plant> mPlants;
     final private OnListItemClickListener mOnListItemClickListener;
     final private OnListItemLongClickListener mOnListItemLongClickListener;
+    private DatabaseReference mDatabaseRef;
+    private Context context;
+    File localFile;
 
     public PlantAdapterRV(ArrayList<Plant> plants, OnListItemClickListener listener, OnListItemLongClickListener listener2){
         mPlants = plants;
@@ -35,7 +55,8 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
 
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.listi_tem_plant_card, parent, false);
         return new ViewHolder(view);
     }
@@ -47,12 +68,6 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         viewHolder.name.setText(mPlants.get(position).getName());
         viewHolder.nameLatin.setText(mPlants.get(position).getLatinName());
-
-        if (mPlants.get(position).getImgUri() != null)
-            viewHolder.icon.setImageURI(mPlants.get(position).getImgUri());
-        else
-            viewHolder.icon.setImageResource(mPlants.get(position).getmIconId());
-
         viewHolder.waterTExt.setText(mPlants.get(position).waterWhen());
 
         //Add margin top to the first row of cards
@@ -64,6 +79,26 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) viewHolder.card.getLayoutParams();
             lp.setMargins(15,15,15,15);
         }
+
+
+        //Download and view image
+        StorageReference ref = FirebaseStorage.getInstance().getReference();
+        ref.child("images/" + mPlants.get(position).getImageId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                //viewHolder.icon.setImageURI(uri);
+                Glide.with(context)
+                        .load(uri)
+                        .into(viewHolder.icon);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.e("tag", exception.toString());
+            }
+        });
 
 
         //If plant needs watering
@@ -116,7 +151,6 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
 
         viewHolder.waterAmount.setText(mPlants.get(position).getWaterLevel() + "x");
         viewHolder.location.setText(HomeRepository.getInstance().getHome().getValue().getRoomById(mPlants.get(position).getRoomId()));
-
     }
     public int getItemCount() {
         return mPlants.size();
