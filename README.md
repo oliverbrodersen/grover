@@ -3,7 +3,7 @@
 
 grover skal hjælpe plante-elskeren i os alle med at passe på vores følsomme grønne venner
 
-![preview](https://i.imgur.com/U6jGiI6.png)
+![preview](https://i.imgur.com/tprTbgg.jpg)
 
 ## Features
 Som bruger vil jeg kunne: 
