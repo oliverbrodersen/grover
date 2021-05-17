@@ -3,23 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@id/nav_home">
 
     <fragment
         android:id="@+id/nav_home"
         android:name="com.example.grover.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_plantInfoFragment"
+            app:destination="@id/plantInfoFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_gallery"
+            app:destination="@id/nav_gallery" />
+        <action
+            android:id="@+id/action_nav_home_to_signOutFragment"
+            app:destination="@id/signOutFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.example.grover.ui.addplant.AddPlantFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_add_plant" />
-
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.grover.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/plantInfoFragment"
+        android:name="com.example.grover.ui.plantinfo.PlantInfoFragment"
+        android:label="fragment_plant_info"
+        tools:layout="@layout/fragment_plant_info" />
+    <fragment
+        android:id="@+id/myFriends"
+        android:name="com.example.grover.ui.myfriends.MyFriendsFragment"
+        android:label="my_friends_fragment"
+        tools:layout="@layout/fragment_my_friends" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.grover.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
+    <fragment
+        android:id="@+id/signOutFragment"
+        android:name="com.example.grover.SignOutFragment"
+        android:label="fragment_sign_out"
+        tools:layout="@layout/fragment_sign_out" />
 </navigation>

@@ -30,12 +30,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private DrawerLayout mDrawerLayout;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInOptions gso;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                R.id.nav_home, R.id.nav_gallery,  R.id.myFriends)
                 .setDrawerLayout(mDrawerLayout)
                 .build();
 
@@ -84,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Glide.with(headerView).load(HomeRepository.getInstance().getUser().getPhotoUrl()).into(profilePic);
             }
         });
-
-        //navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -93,20 +92,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
-        switch (item.getItemId()) {
-            case R.id.nav_logout: {
-                signOut();
-                break;
-            }
-        }
-        //close navigation drawer
-        mDrawerLayout.closeDrawer(GravityCompat.START);
-        return true;
     }
     private void signOut(){
         FirebaseAuth.getInstance().signOut();

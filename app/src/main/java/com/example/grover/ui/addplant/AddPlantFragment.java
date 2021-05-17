@@ -1,13 +1,16 @@
 package com.example.grover.ui.addplant;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,10 +42,9 @@ import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
 import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
-import com.example.grover.models.TrefleSearchAdapterRV;
+import com.example.grover.ui.addplant.rv.TrefleSearchAdapterRV;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
 import com.example.grover.ui.home.HomeFragment;
-import com.example.grover.ui.plantinfo.PlantInfoFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.slider.Slider;
@@ -51,10 +54,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -74,8 +74,8 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
     private Slider waterAmount;
     private ImageView pPhotoView;
     private CardView cardLoad;
-    private TextView tvOtherLocation;
-    private Button createButton, bOtherLocation;
+    private TextView tvOtherLocation, photoError;
+    private Button createButton, bOtherLocation, deleteButton;
     private RecyclerView trefleSearchList;
     private Spinner spin;
     private TrefleSearchAdapterRV trefleSearchAdapter;
@@ -94,7 +94,9 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         waterAmount = root.findViewById(R.id.editTextNumber);
         notes = root.findViewById(R.id.editTextTextMultiLine2);
         createButton = root.findViewById(R.id.button2);
+        deleteButton = root.findViewById(R.id.deleteButton);
         tvOtherLocation = root.findViewById(R.id.textView106);
+        photoError = root.findViewById(R.id.photoError);
         etOtherLocation = root.findViewById(R.id.editTextOtherLocation);
         bOtherLocation = root.findViewById(R.id.buttonOtherLocation);
         pPhotoView = (ImageView) root.findViewById(R.id.imageView8);
@@ -108,15 +110,14 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         spin = (Spinner) root.findViewById(R.id.spinner);
         spin.setOnItemSelectedListener(this);
 
-        //Creating the ArrayAdapter instance having the country list
+        //Creating the ArrayAdapter instance having the room list
         ArrayAdapter aa = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_item,galleryViewModel.getHome().getValue().getRoomsList());
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(aa);
+
+
         String plantId = null;
-        if (this.getArguments() != null){
-            plantId = this.getArguments().getString("PlantId");
-        }
         if (this.getArguments() != null) {
             edit = true;
             plantId = this.getArguments().getString("PlantId");
@@ -134,6 +135,7 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
                     Glide.with(getContext())
                             .load(uri)
                             .into(pPhotoView);
+                    photoError.setVisibility(View.INVISIBLE);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -167,28 +169,105 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         });
         createButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Boolean check = false;
                 closeKeyboard();
-                newPlant.setName(name.getText().toString());
-                newPlant.setLatinName(species.getText().toString());
-                newPlant.setDaysBetweenWater(Integer.parseInt(String.valueOf(daysBetweenWater.getText())));
-                newPlant.setWaterLevel((int) waterAmount.getValue());
-                newPlant.setNote(notes.getText().toString());
-                if (!edit){
-                    newPlant.setImageId(imageId);
-                    newPlant.setTrefleId(trefleIdPlaceholder);
-                    uploadImage();
+                if( TextUtils.isEmpty(name.getText())){
+                    check = true;
+                    name.setError( "Name is required!" );
                 }
-                galleryViewModel.addPlant(newPlant, oldPlant);
+                if( TextUtils.isEmpty(daysBetweenWater.getText())){
+                    check = true;
+                    daysBetweenWater.setError( "Days between watering is required!" );
+                }
+                if( newPlant.getImageId() == null){
+                    check = true;
+                    photoError.setVisibility(View.VISIBLE);
+                }
+                if (check){
+                    Toast.makeText(getContext(), "Please fill out required fields", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    newPlant.setName(name.getText().toString());
+                    newPlant.setLatinName(species.getText().toString());
+                    newPlant.setDaysBetweenWater(Integer.parseInt(String.valueOf(daysBetweenWater.getText())));
+                    newPlant.setWaterLevel((int) waterAmount.getValue());
+                    newPlant.setNote(notes.getText().toString());
+                    if (!edit) {
+                        newPlant.setTrefleId(trefleIdPlaceholder);
+                        uploadImage();
+                    }
+                    galleryViewModel.addPlant(newPlant, oldPlant);
 
-                FragmentTransaction fragmentTransaction = getActivity()
-                        .getSupportFragmentManager().beginTransaction();
-                HomeFragment fragment = new HomeFragment();
-                fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
-                fragmentTransaction.commit();
+                    FragmentTransaction fragmentTransaction = getActivity()
+                            .getSupportFragmentManager().beginTransaction();
+                    HomeFragment fragment = new HomeFragment();
+                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                    fragmentTransaction.commit();
+                }
             }
         });
-        pPhotoView.setOnClickListener(this);
-        cardLoad.setCardBackgroundColor(getResources().getColor(R.color.image_load_idle));
+
+        //Only allow photo selection on creation
+        if (!edit){
+            pPhotoView.setOnClickListener(this);
+            cardLoad.setCardBackgroundColor(getResources().getColor(R.color.image_load_idle));
+            deleteButton.setVisibility(View.GONE);
+        }
+        else{
+            cardLoad.setCardBackgroundColor(getResources().getColor(R.color.image_load_uploaded));
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                    //builder.setMessage("Are you sure you want to permanently delete this plant?")
+                    //        .setCancelable(false)
+                    //        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    //            public void onClick(DialogInterface dialog, int id) {
+                    //                galleryViewModel.deletePlant(newPlant.getPlantId());
+                    //                Toast.makeText(getContext(), "Plant successfully deleted", Toast.LENGTH_SHORT).show();
+                    //                FragmentTransaction fragmentTransaction = getActivity()
+                    //                        .getSupportFragmentManager().beginTransaction();
+                    //                HomeFragment fragment = new HomeFragment();
+                    //                fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                    //                fragmentTransaction.commit();
+                    //            }
+                    //        })
+                    //        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    //            public void onClick(DialogInterface dialog, int id) {
+                    //                dialog.cancel();
+                    //            }
+                    //        });
+                    //AlertDialog alert = builder.create();
+
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    galleryViewModel.deletePlant(newPlant.getPlantId());
+                                    Toast.makeText(getContext(), "Plant successfully deleted", Toast.LENGTH_SHORT).show();
+                                    FragmentTransaction fragmentTransaction = getActivity()
+                                            .getSupportFragmentManager().beginTransaction();
+                                    HomeFragment fragment = new HomeFragment();
+                                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                                    fragmentTransaction.commit();
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Are you sure you want to permanently delete this plant?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                }
+            });
+            deleteButton.setVisibility(View.VISIBLE);
+        }
+
+
 
         //Trefle lookup init
         trefleSearchList = root.findViewById(R.id.rvTrefle);
@@ -294,7 +373,6 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
-            // TODO Auto-generated method stub
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -315,7 +393,9 @@ public class AddPlantFragment extends Fragment implements TrefleSearchAdapterRV.
             Uri selectedImage = data.getData();
             cardLoad.setCardBackgroundColor(getResources().getColor(R.color.image_load_uploaded));
             newPlant.setImgUri(selectedImage);
+            newPlant.setImageId(imageId);
             pPhotoView.setImageURI(selectedImage);
+            photoError.setVisibility(View.INVISIBLE);
         }
     }
 

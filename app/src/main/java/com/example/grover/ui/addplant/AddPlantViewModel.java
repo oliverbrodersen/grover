@@ -46,4 +46,8 @@ public class AddPlantViewModel extends ViewModel {
     public void clearSearch() {
         repository.clearSearch();
     }
+
+    public void deletePlant(String plantId) {
+        repository.deletePlant(plantId);
+    }
 }

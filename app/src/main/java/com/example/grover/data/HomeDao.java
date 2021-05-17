@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.example.grover.models.FirebaseDatabaseUser;
 import com.example.grover.models.FirebaseHome;
 import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
@@ -34,8 +35,11 @@ import retrofit2.Response;
 
 public class HomeDao {
     private MutableLiveData<Home> home;
+    private MutableLiveData<Home> friendHome;
     private MutableLiveData<List<TrefleSearchQueryStripped>> searchQuery;
     private FirebaseUser user;
+    private MutableLiveData<FirebaseDatabaseUser> firebaseDatabaseUser;
+    private MutableLiveData<List<FirebaseDatabaseUser>> friendList;
     private static HomeDao instance;
     private FirebaseDatabase database;
 
@@ -44,30 +48,11 @@ public class HomeDao {
         database = FirebaseDatabase.getInstance();
 
         home = new MutableLiveData<>();
+        friendHome = new MutableLiveData<>();
         searchQuery = new MutableLiveData<>();
-
-        //ArrayList<Plant> plants = new ArrayList<>();
-        //Plant p1 = new Plant(1,"Fredslilje", "Spathiphyllum", R.drawable.p2, 5, "19-04-2021", 3, 223320, 1, "Fik den af min farmor");
-        //p1.log("Water");
-        //p1.log("Water");
-        //p1.log("Fertilizer");
-        //p1.log("Water");
-        //p1.log("Fertilizer");
-        //p1.log("Repotting");
-        //p1.log("Water");
-        //p1.log("Water");
-        //plants.add(p1);
-        //plants.add(new Plant(2,"Philodendron","Philodendron Red Beauty", R.drawable.p1, 14, "29-03-2021", 3, 0, 1, "Aflæs på vandmåleren om den skal vandes inden vanding"));
-        //plants.add(new Plant(3,"Cocospalme", "Cocos nucifera", R.drawable.p3, 8, "17-04-2021", 1,122263, 2, "Ikke en kokos plamle"));
-        //plants.add(new Plant(4,"Banantræ", "Bananus fantomium", R.drawable.p4, 15,"17-04-2021", 1,0, 1, "Kan ikke dø"));
-        //plants.add(new Plant(5,"Trailing Jade", "Bananus fantomium", R.drawable.p5, 15,"17-04-2021", 2,0,1,""));
-        //plants.add(new Plant(6,"Nerve plante", "Fittonia", R.drawable.p6, 5,"19-04-2021", 2,196579,1,"Viser når den skal vandes vd at dø"));
-        //plants.add(new Plant(7,"Guldranke", "Epipremnum Aureum", R.drawable.p7, 10,"17-04-2021", 2,132809, 1,""));
-        //
-        //Home _home = new Home(420, plants);
-        //_home.addRoom("Living room", 1);
-        //_home.addRoom("Kitchen", 2);
-        //home.setValue(_home);
+        firebaseDatabaseUser = new MutableLiveData<>();
+        friendList = new MutableLiveData<>();
+        friendList.setValue(new ArrayList<FirebaseDatabaseUser>());
 
         List<TrefleSearchQueryStripped> sq = new ArrayList<>();
         searchQuery.setValue(sq);
@@ -160,8 +145,10 @@ public class HomeDao {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                //String value = dataSnapshot.getValue(String.class);
-                home.setValue(new Home(dataSnapshot.getValue(FirebaseHome.class)));
+                if (dataSnapshot.getValue(FirebaseHome.class) != null)
+                    home.setValue(new Home(dataSnapshot.getValue(FirebaseHome.class)));
+                else
+                    home.setValue(new Home(new FirebaseHome()));
                 //Log.d("TAG", "Value is: " + value);
             }
 
@@ -172,6 +159,7 @@ public class HomeDao {
             }
         });
     }
+
     public void addPlant(Plant newPlant, Plant oldPlant) {
         Home h = home.getValue();
         if (h.getPlantById(newPlant.getPlantId()) == null)
@@ -209,14 +197,140 @@ public class HomeDao {
 
     public void setUser(FirebaseUser user) {
         this.user = user;
+        //This checks if user has been loged in before. If not they will be setup in the system
+        getUserFromFirebase(user);
         getHomeFromFirebase(user.getUid());
+    }
+
+    public void getUserFromFirebase(FirebaseUser user){
+        DatabaseReference myRef = database.getReference("Users").child(user.getUid());// Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                if (dataSnapshot.getValue() == null){
+                    myRef.setValue(new FirebaseDatabaseUser(user.getEmail(), user.getPhotoUrl().toString(), user.getUid(), user.getDisplayName()));
+                    //TODO do some sort of tutorial here
+                }
+                else
+                    firebaseDatabaseUser.setValue(dataSnapshot.getValue(FirebaseDatabaseUser.class));
+                //Log.d("TAG", "Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("TAG", "Failed to read value.", error.toException());
+            }
+        });
     }
     public FirebaseUser getUser(){
         return user;
+    }
+    public LiveData<FirebaseDatabaseUser> getFireBaseDatabaseUser(){
+        return firebaseDatabaseUser;
     }
 
     public void updateDatabase() {
         DatabaseReference myRef = database.getReference("Homes").child(user.getUid());// Read from the database
         myRef.setValue(home.getValue().getAsFirebaseHome());
+    }
+
+    public MutableLiveData<List<FirebaseDatabaseUser>> getFriendList() {
+        return friendList;
+    }
+
+    public void getFriends() {
+        if (firebaseDatabaseUser.getValue().getFriends() != null){
+            friendList.setValue(new ArrayList<FirebaseDatabaseUser>());
+            for (String friend:firebaseDatabaseUser.getValue().getFriends()) {
+                DatabaseReference myRef = database.getReference("Users").child(friend);// Read from the database
+                myRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.i("Friends", dataSnapshot.getValue(FirebaseDatabaseUser.class).getEmail());
+                        friendList.getValue().add(dataSnapshot.getValue(FirebaseDatabaseUser.class));
+                        friendList.setValue(friendList.getValue());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.w("Friends", "Failed to read value.", error.toException());
+                    }
+                });
+            }
+        }
+    }
+
+    public void sendFriendRequest(String email) {
+        DatabaseReference myRef = database.getReference("Users");// Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    if (postSnapshot.getValue(FirebaseDatabaseUser.class).getEmail().toLowerCase().equals(email.toLowerCase())){
+                        FirebaseDatabaseUser friendRef = postSnapshot.getValue(FirebaseDatabaseUser.class);
+                        if (firebaseDatabaseUser.getValue().isNotAlreadyFriends(friendRef.getGreenhouseId())){
+                            //Tell other user that you are friends now
+                            friendRef.addFriend(firebaseDatabaseUser.getValue().getGreenhouseId());
+                            DatabaseReference myRefFriend = database.getReference("Users").child(friendRef.getGreenhouseId());// Read from the database
+                            myRefFriend.setValue(friendRef);
+
+                            //Update your own friendlist
+                            firebaseDatabaseUser.getValue().addFriend(friendRef.getGreenhouseId());
+                            DatabaseReference myRefFriends = database.getReference("Users").child(firebaseDatabaseUser.getValue().getGreenhouseId());// Read from the database
+                            myRefFriends.setValue(firebaseDatabaseUser.getValue());
+                        }
+                    }
+                }
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w("Friends", "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    public LiveData<Home> getHome(String homeId) {
+        DatabaseReference myRef = database.getReference("Homes").child(homeId);// Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                if (dataSnapshot.getValue(FirebaseHome.class) != null)
+                    friendHome.setValue(new Home(dataSnapshot.getValue(FirebaseHome.class)));
+                else
+                    friendHome.setValue(new Home(new FirebaseHome()));
+                //Log.d("TAG", "Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("TAG", "Failed to read value.", error.toException());
+            }
+        });
+        return friendHome;
+    }
+
+    public LiveData<Home> getFriendHome() {
+        return friendHome;
+    }
+
+    public FirebaseDatabaseUser getFriend(String userId) {
+        for (FirebaseDatabaseUser friend:friendList.getValue()) {
+            if (friend.getGreenhouseId().equals(userId))
+                return friend;
+        }
+        return null;
+    }
+
+    public void deletePlant(String plantId) {
+        home.getValue().getPlants().remove(home.getValue().getPlantById(plantId));
+        home.setValue(home.getValue());
     }
 }

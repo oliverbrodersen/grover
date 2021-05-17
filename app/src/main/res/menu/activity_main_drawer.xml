@@ -6,8 +6,7 @@
     android:layout_width="100dp">
 
     <group
-        android:id="@+id/plantGroup"
-        android:checkableBehavior="single">
+        android:id="@+id/plantGroup">
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic__01_home"
@@ -17,24 +16,15 @@
             android:icon="@drawable/ic_addplant"
             android:title="Add new plant" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/myFriends"
             android:icon="@drawable/ic__01_friends"
-            android:title="@string/menu_slideshow" />
-    </group>
-    <group
-        android:id="@+id/friendGroup"
-        android:checkableBehavior="single">
-        <item
-            android:title="Add friends" />
-        <item
-            android:title="My friends" />
+            android:title="Friends" />
     </group>
     <group
         android:id="@+id/accountGroup"
         android:checkableBehavior="single">
-        <item android:title="My account" />
 
-        <item android:id="@+id/nav_logout"
+        <item android:id="@+id/signOutFragment"
             android:title="Log out" />
     </group>
 </menu>

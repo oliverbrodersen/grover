@@ -1,4 +1,4 @@
-package com.example.grover.models;
+package com.example.grover.ui.addplant.rv;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,13 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.example.grover.MainActivity;
 import com.example.grover.R;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
 
@@ -77,13 +72,13 @@ public class TrefleSearchAdapterRV extends RecyclerView.Adapter<TrefleSearchAdap
             selected = itemView.findViewById(R.id.selectedCheck);
             itemView.setOnClickListener(this);
         }
-        public void loadImage(String url){
-            new DownloadImageTask(image).execute(url);
-        }
 
         @Override
         public void onClick(View v) {
             mOnListItemClickListener.onListItemClick(getAdapterPosition());
+        }
+        public void loadImage(String url){
+            new DownloadImageTask(image).execute(url);
         }
 
         private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

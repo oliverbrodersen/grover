@@ -3,15 +3,13 @@ package com.example.grover.models;
 public class Room {
     private String name;
     private int roomId;
-    private int homeId;
 
     public Room() {
     }
 
-    public Room(String name, int roomId, int homeId) {
+    public Room(String name, int roomId) {
         this.name = name;
         this.roomId = roomId;
-        this.homeId = homeId;
     }
 
     public void setName(String name) {
@@ -22,9 +20,6 @@ public class Room {
         this.roomId = roomId;
     }
 
-    public void setHomeId(int homeId) {
-        this.homeId = homeId;
-    }
 
     public String getName() {
         return name;
@@ -32,10 +27,6 @@ public class Room {
 
     public int getRoomId() {
         return roomId;
-    }
-
-    public int getHomeId() {
-        return homeId;
     }
 }
 

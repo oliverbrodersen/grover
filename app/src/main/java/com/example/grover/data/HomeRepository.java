@@ -2,12 +2,14 @@ package com.example.grover.data;
 
 import androidx.lifecycle.LiveData;
 
+import com.example.grover.models.FirebaseDatabaseUser;
 import com.example.grover.models.Home;
 import com.example.grover.models.Plant;
 import com.example.grover.models.trefle.TrefleSearchQueryStripped;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeRepository {
@@ -65,5 +67,36 @@ public class HomeRepository {
 
     public void updateDatabase() {
         homeDao.updateDatabase();
+    }
+
+    public void getFriends() {
+        homeDao.getFriends();
+    }
+
+    public LiveData<FirebaseDatabaseUser> getFireBaseDatabaseUser(){
+        return homeDao.getFireBaseDatabaseUser();
+    }
+    public void sendFriendRequest(String email) {
+        homeDao.sendFriendRequest(email);
+    }
+
+    public LiveData<List<FirebaseDatabaseUser>> getFriendList() {
+        return homeDao.getFriendList();
+    }
+
+    public LiveData<Home> getHome(String homeId) {
+        return homeDao.getHome(homeId);
+    }
+
+    public LiveData<Home> getFriendHome() {
+        return homeDao.getFriendHome();
+    }
+
+    public FirebaseDatabaseUser getFriend(String userId) {
+        return homeDao.getFriend(userId);
+    }
+
+    public void deletePlant(String plantId) {
+        homeDao.deletePlant(plantId);
     }
 }

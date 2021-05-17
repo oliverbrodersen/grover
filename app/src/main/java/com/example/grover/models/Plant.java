@@ -1,9 +1,11 @@
 package com.example.grover.models;
 
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.grover.data.ServiceGenerator;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -65,7 +68,7 @@ public class Plant {
         this.imageId = imageId;
         log = new ArrayList<>();
         sdf= new SimpleDateFormat("dd-M-yyyy");
-        treflePlantInfo = getTreflePlantInfo();
+        //treflePlantInfo = getTreflePlantInfo();
     }
     public Plant(){
         this.name = null;
@@ -81,7 +84,7 @@ public class Plant {
         sdf= new SimpleDateFormat("dd-M-yyyy");
         lastWaterDate = sdf.format(new Date());
         lastWaterDateUndo = sdf.format(new Date());
-        treflePlantInfo = getTreflePlantInfo();
+        //treflePlantInfo = getTreflePlantInfo();
     }
 
     public Plant(FirebasePlant ref) {
@@ -99,7 +102,7 @@ public class Plant {
         this.note = ref.getNote();
         log = (ArrayList<PlantLogItem>) ref.getLog();
         sdf= new SimpleDateFormat("dd-M-yyyy");
-        treflePlantInfo = getTreflePlantInfo();
+        //treflePlantInfo = getTreflePlantInfo();
     }
 
     public FirebasePlant getAsFirebasePlant(){
@@ -161,7 +164,10 @@ public class Plant {
     public void log(PlantLogItem plantLogItem){
         log.add(plantLogItem);
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public ArrayList<PlantLogItem> getLog() {
+        log.sort(new OrderLogByDate());
+        Collections.reverse(this.log);
         return log;
     }
 
@@ -330,5 +336,21 @@ public class Plant {
         PlantLogItem logItem = new PlantLogItem("Update");
         logItem.setNote("Changes has been made to:" + changes);
         log(logItem);
+    }
+
+    public void closeAllLogItems(){
+        for (PlantLogItem log : log){
+            if (log != null)
+                log.setLongpressedAsBoolean(false);
+        }
+    }
+
+    public void longPressLog(int clickedItemIndex) {
+        closeAllLogItems();
+        log.get(clickedItemIndex).setLongpressedAsBoolean(true);
+    }
+
+    public void removeLogItem(int position) {
+        log.remove(position);
     }
 }

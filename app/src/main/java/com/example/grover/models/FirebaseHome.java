@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseHome {
-    private int homeId;
     private List<FirebasePlant> plants;
     private List<Room> rooms;
 
-    public FirebaseHome(int homeId, List<FirebasePlant> plants, List<Room> rooms) {
-        this.homeId = homeId;
+    public FirebaseHome(List<FirebasePlant> plants, List<Room> rooms) {
         this.plants = plants;
         this.rooms = rooms;
     }
@@ -17,14 +15,6 @@ public class FirebaseHome {
     public FirebaseHome() {
         plants = new ArrayList<>();
         rooms = new ArrayList<>();
-    }
-
-    public int getHomeId() {
-        return homeId;
-    }
-
-    public void setHomeId(int homeId) {
-        this.homeId = homeId;
     }
 
     public List<FirebasePlant> getPlants() {

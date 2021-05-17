@@ -1,7 +1,10 @@
-package com.example.grover.models;
+package com.example.grover.ui.home.rv;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -12,30 +15,26 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.grover.R;
 import com.example.grover.data.HomeRepository;
+import com.example.grover.models.FirebaseDatabaseUser;
+import com.example.grover.models.Plant;
+import com.example.grover.ui.addplant.rv.TrefleSearchAdapterRV;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHolder> {
@@ -45,6 +44,7 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
     final private OnListItemLongClickListener mOnListItemLongClickListener;
     private DatabaseReference mDatabaseRef;
     private Context context;
+    private FirebaseDatabaseUser owner;
     File localFile;
 
     public PlantAdapterRV(ArrayList<Plant> plants, OnListItemClickListener listener, OnListItemLongClickListener listener2){
@@ -141,7 +141,13 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         else
             viewHolder.trefleLogo.setVisibility(View.INVISIBLE);
 
-
+        if (owner == null){
+            viewHolder.ownerContainer.setVisibility(View.GONE);
+        }
+        else {
+            viewHolder.loadImage(owner.getPhotoUrl());
+            viewHolder.ownerContainer.setVisibility(View.VISIBLE);
+        }
 
         //Align card
         if (position % 2 == 0)
@@ -156,6 +162,10 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         return mPlants.size();
     }
 
+    public void setOwner(FirebaseDatabaseUser friend) {
+        owner = friend;
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         LinearLayout cardHolder;
@@ -165,9 +175,11 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
         TextView waterTExt;
         TextView location;
         ImageView icon;
+        ImageView ownerImage;
         ImageView trefleLogo;
         ImageView drop1;
         CardView card;
+        CardView ownerContainer;
         CardView hydroMeter;
         ImageView hydroMeterBg;
         Context context;
@@ -176,10 +188,12 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             super(itemView);
             card = itemView.findViewById(R.id.card);
             cardHolder = itemView.findViewById(R.id.cardHolder);
+            ownerContainer = itemView.findViewById(R.id.ownerContainer);
             name = itemView.findViewById(R.id.plantName);
             nameLatin = itemView.findViewById(R.id.textView4);
             waterAmount = itemView.findViewById(R.id.textView6);
             waterTExt = itemView.findViewById(R.id.waterText);
+            ownerImage = itemView.findViewById(R.id.ownerImage);
             location = itemView.findViewById(R.id.location);
             icon = itemView.findViewById(R.id.imageView2);
             hydroMeter = itemView.findViewById(R.id.hydroMeter);
@@ -200,6 +214,39 @@ public class PlantAdapterRV extends RecyclerView.Adapter<PlantAdapterRV.ViewHold
             mOnListItemLongClickListener.onListItemLongClick(getAdapterPosition());
             return true;
         }
+
+        public void loadImage(String url){
+            new DownloadImageTask(ownerImage).execute(url);
+        }
+
+        private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+            ImageView bmImage;
+
+            public DownloadImageTask(ImageView bmImage) {
+                this.bmImage = bmImage;
+            }
+
+            protected Bitmap doInBackground(String... urls) {
+                String urldisplay = urls[0];
+                Bitmap mIcon11 = null;
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+                return mIcon11;
+            }
+
+            protected void onPostExecute(Bitmap result) {
+                bmImage.setImageBitmap(result);
+            }
+        }
+    }
+
+    public interface OnTrefleResultsItemClickListener {
+        void onListItemClick(int clickedItemIndex);
     }
 
     public interface OnListItemClickListener {

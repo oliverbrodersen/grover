@@ -7,13 +7,11 @@ import androidx.annotation.RequiresApi;
 import java.util.ArrayList;
 
 public class Home {
-    private final int id;
     private ArrayList<Plant> plants;
     private ArrayList<Plant> plantsDisplayed;
     private ArrayList<Room> rooms;
 
     public Home(FirebaseHome ref){
-        id = ref.getHomeId();
         rooms = (ArrayList<Room>) ref.getRooms();
         plants = new ArrayList<>();
         for (FirebasePlant firebasePlant : ref.getPlants()){
@@ -22,8 +20,7 @@ public class Home {
         plantsDisplayed = plants;
     }
 
-    public Home(int id, ArrayList<Plant> plants) {
-        this.id = id;
+    public Home(ArrayList<Plant> plants) {
         this.plants = plants;
         plantsDisplayed = plants;
         rooms = new ArrayList<>();
@@ -33,9 +30,6 @@ public class Home {
         return plants.indexOf(plant);
     }
 
-    public int getId() {
-        return id;
-    }
 
     public ArrayList<Plant> getPlants() {
         return plants;
@@ -51,7 +45,6 @@ public class Home {
         for(Plant plant : plants){
             firebasePlantArrayList.add(plant.getAsFirebasePlant());
         }
-        firebaseHome.setHomeId(id);
         firebaseHome.setRooms(rooms);
         firebaseHome.setPlants(firebasePlantArrayList);
         return firebaseHome;
@@ -63,6 +56,13 @@ public class Home {
             return "Your plants are looking good";
         return "You have " + ptw + " plant" + (ptw>1?"s":"") + " that needs water!";
     }
+
+    public String getPlantStatus(String homeOwner) {
+        int ptw = plantsToWater();
+        if(ptw == 0)
+            return homeOwner + "'s plants are looking good";
+        return homeOwner + " have " + ptw + " plant" + (ptw>1?"s":"") + " that needs water!";
+    }
     public int plantsToWater(){
         int i = 0;
         for (Plant plant:plants) {
@@ -72,11 +72,11 @@ public class Home {
         return i;
     }
     public void addRoom(String name){
-        Room room = new Room(name,Integer.parseInt(id + "" + rooms.size()) , id);
+        Room room = new Room(name,rooms.size() + 1);
         rooms.add(room);
     }
     public void addRoom(String name, int roomId){
-        Room room = new Room(name, roomId , id);
+        Room room = new Room(name, roomId);
         rooms.add(room);
     }
 
@@ -87,7 +87,7 @@ public class Home {
     public int getPositionOfRoom(int id){
         int position = 0;
         for (int i = 0; i < rooms.size(); i++) {
-            if (rooms.get(i).getHomeId() == id)
+            if (rooms.get(i).getRoomId() == id)
                 return position;
             position++;
         }
@@ -143,4 +143,5 @@ public class Home {
     public void editPlant(Plant newPlant, Plant oldPlant) {
         getPlantById(newPlant.getPlantId()).update(oldPlant);
     }
+
 }

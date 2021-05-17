@@ -13,6 +13,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bg">#f8f8f8</color>
     <color name="bg_dark">#2B2B2B</color>
+    <color name="light_gray">#E1E1E1</color>
     <color name="image_load_idle">#393939</color>
     <color name="image_load_progress">#feb908</color>
     <color name="image_load_uploaded">#5db913</color>
